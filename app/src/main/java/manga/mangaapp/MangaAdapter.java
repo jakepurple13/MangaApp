@@ -1,10 +1,10 @@
 package manga.mangaapp;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,13 +16,13 @@ import com.squareup.picasso.Picasso;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.List;
 
+import manga.mangaapp.MangaSide.MangaInfoActivity;
 import manga.mangaapp.mangaedenclient.Chapter;
-import manga.mangaapp.mangaedenclient.ChapterDetails;
 import manga.mangaapp.mangaedenclient.ChapterPage;
 import manga.mangaapp.mangaedenclient.Manga;
 import manga.mangaapp.mangaedenclient.MangaDetails;
+import manga.mangaapp.mangaedenclient.MangaEden;
 import manga.mangaapp.mangaedenclient.MangaEdenClient;
 
 /**
@@ -35,6 +35,9 @@ public class MangaAdapter extends RecyclerView.Adapter<MangaAdapter.ViewHolder>{
     //Contact activity
     MainActivity in;
     MangaEdenClient client;
+    int pageNumber = 0;
+    int chapterNumber = 0;
+    ChapterPage[] chaptersList;
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -79,12 +82,68 @@ public class MangaAdapter extends RecyclerView.Adapter<MangaAdapter.ViewHolder>{
     public void onBindViewHolder(ViewHolder holder, final int position) {
 
         TextView tv = holder.mTextView;
-        ImageView ib = holder.imageView;
+        final ImageView ib = holder.imageView;
         tv.setText(mDataset.get(position).getTitle());
 
-        Manga manga = mDataset.get(position);
-        new RetrieveManga(manga, ib).execute();
+        final Manga manga = mDataset.get(position);
 
+        new RetrieveInfo(new AsyncTasks() {
+            @Override
+            public void onPreExecute() {
+
+            }
+
+            @Override
+            public boolean doInBackground() {
+                try {
+                    // Get manga details
+                    MangaDetails mangaDetails = client.getMangaDetails(manga.getId());
+                    Chapter[] chapters = mangaDetails.getChapters();
+                    try {
+
+                        // Get chapter details
+                    /*ChapterDetails chapterDetails = client.getChapterDetails(chapters[0].getId());
+                    ChapterPage[] pages = chapterDetails.getPages();
+                    chaptersList = pages;*/
+                        // Get chapter page image URLs
+                        //final URI imageUrl = pages[0].getImageURI();
+                        final URI imageUrl = MangaEden.manga2ImageURI(mangaDetails.getImage());
+                        Handler uiHandler = new Handler(Looper.getMainLooper());
+                        uiHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Picasso.with(in)
+                                        .load(String.valueOf(imageUrl))
+                                        .placeholder(android.R.mipmap.sym_def_app_icon)
+                                        .into(ib);
+                            }
+                        });
+                    } catch (ArrayIndexOutOfBoundsException e1) {
+                        e1.printStackTrace();
+                    }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return true;
+            }
+
+            @Override
+            public void onPostExecute(Boolean success) {
+
+            }
+        }).execute();
+
+        ib.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent i = new Intent(in, MangaInfoActivity.class);
+                i.putExtra("manga_id", manga.getId());
+                in.startActivity(i);
+
+            }
+        });
 
     }
 
@@ -112,20 +171,19 @@ public class MangaAdapter extends RecyclerView.Adapter<MangaAdapter.ViewHolder>{
                 try {
 
                     // Get chapter details
-                    ChapterDetails chapterDetails = client.getChapterDetails(chapters[0].getId());
+                    /*ChapterDetails chapterDetails = client.getChapterDetails(chapters[0].getId());
                     ChapterPage[] pages = chapterDetails.getPages();
-
-
+                    chaptersList = pages;*/
                     // Get chapter page image URLs
-                    final URI imageUrl = pages[0].getImageURI();
+                    //final URI imageUrl = pages[0].getImageURI();
+                    final String imageUrl = mangaDetails.getImage();
                     Handler uiHandler = new Handler(Looper.getMainLooper());
                     uiHandler.post(new Runnable() {
                         @Override
                         public void run() {
                             Picasso.with(in)
-                                    .load(String.valueOf(imageUrl))
+                                    .load(imageUrl)
                                     .placeholder(android.R.mipmap.sym_def_app_icon)
-                                    .fit()
                                     .into(ib);
                         }
                     });

@@ -17,6 +17,10 @@ public class MangaEden {
     return URI.create("http://cdn.mangaeden.com/mangasimg/" + chapterPage.getImage());
   }
 
+  public static URI manga2ImageURI(String url) {
+    return URI.create("http://cdn.mangaeden.com/mangasimg/" + url);
+  }
+
   public static URI chapter2PageURI(Chapter chapter, MangaDetails mangaDetails, int page) {
     return URI.create(String.format("http://www.mangaeden.com/en-manga/%s/%d/%d",
       mangaDetails.getAlias(), chapter.getNumber(), page));

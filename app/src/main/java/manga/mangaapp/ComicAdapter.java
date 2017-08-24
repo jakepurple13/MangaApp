@@ -19,6 +19,7 @@ import com.karumi.marvelapiclient.model.CharactersQuery;
 import com.karumi.marvelapiclient.model.ComicDto;
 import com.karumi.marvelapiclient.model.ComicsDto;
 import com.karumi.marvelapiclient.model.ComicsQuery;
+import com.karumi.marvelapiclient.model.MarvelImage;
 import com.karumi.marvelapiclient.model.MarvelResponse;
 import com.squareup.picasso.Picasso;
 
@@ -34,7 +35,7 @@ import java.util.List;
 
 public class ComicAdapter extends RecyclerView.Adapter<ComicAdapter.ViewHolder>{
     //The list of contacts
-    private ArrayList<ComicDto> mDataset;
+    private List<ComicDto> mDataset;
     //Contact activity
     MainActivity in;
 
@@ -56,7 +57,7 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicAdapter.ViewHolder>{
 
     // Provide a suitable constructor (depends on the kind of dataset)
 
-    public ComicAdapter(ArrayList<ComicDto> myDataset, MainActivity in) {
+    public ComicAdapter(List<ComicDto> myDataset, MainActivity in) {
         mDataset = myDataset;
         this.in = in;
     }
@@ -83,18 +84,18 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicAdapter.ViewHolder>{
         ImageView ib = holder.imageView;
         tv.setText(mDataset.get(position).getTitle());
 
-        //Manga manga = mDataset.get(position);
-        new RetrieveManga(ib).execute();
-
+        new RetrieveComic(mDataset.get(position), ib).execute();
 
     }
 
-    class RetrieveManga extends AsyncTask<String, Void, Boolean> {
+    class RetrieveComic extends AsyncTask<String, Void, Boolean> {
 
         ImageView ib;
+        ComicDto comic;
 
-        public RetrieveManga(ImageView ImageView) {
+        public RetrieveComic(ComicDto comic, ImageView ImageView) {
             ib = ImageView;
+            this.comic = comic;
         }
 
         @Override
@@ -104,66 +105,21 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicAdapter.ViewHolder>{
 
         @Override
         protected Boolean doInBackground(String... urls) {
-            try {
-
-                String publicKey = "8f048136de65d2ca3a0660fa9d074ff0";
-                String privateKey = "ac6e44d7284de6fe16d1a87f703c484f8f25fc08";
-
-                MarvelApiConfig marvelApiConfig = new MarvelApiConfig.Builder(publicKey, privateKey).debug().build();
-
-                CharacterApiClient characterApiClient = new CharacterApiClient(marvelApiConfig);
-                CharactersQuery spider = CharactersQuery.Builder.create().withOffset(0).withLimit(10).build();
-                final MarvelResponse<CharactersDto> all = characterApiClient.getAll(spider);
-
-                Log.e("Line_" + new Throwable().getStackTrace()[0].getLineNumber(), all.toString());
-
-                //characterDtoList = all.getResponse().getCharacters();
 
                 Handler uiHandler = new Handler(Looper.getMainLooper());
                 uiHandler.post(new Runnable() {
                     @Override
                     public void run() {
 
-                        //Random gen = new Random();
+                        MarvelImage marvelImage = comic.getThumbnail();
 
-                        //int num = gen.nextInt(characterDtoList.size());
+                        Picasso.with(in)
+                                .load(marvelImage.getImageUrl(MarvelImage.Size.LANDSCAPE_AMAZING))
+                                .placeholder(android.R.mipmap.sym_def_app_icon)
+                                .into(ib);
 
-                        //MarvelImage marvelImage = characterDtoList.get(num).getThumbnail();
-                    /*
-                    Picasso.with(MainActivity.this)
-                            .load(marvelImage.getImageUrl(MarvelImage.Size.LANDSCAPE_AMAZING))
-                            .placeholder(android.R.mipmap.sym_def_app_icon)
-                            .into(iv);
-                    */
-                        //tv.setText(characterDtoList.get(num).getName());
                     }
                 });
-
-
-                //ComicApiClient comicApiClient1 = new ComicApiClient(marvelApiConfig);
-                //ComicsQuery query2 = ComicsQuery.Builder.create().addCharacter(characterid).withOffset(0).withLimit(10).build();
-                //MarvelResponse<ComicsDto> all3 = comicApiClient1.getAll(query2);
-
-                //Log.e("Line_"+new Throwable().getStackTrace()[0].getLineNumber(), all3.toString());
-
-                ComicApiClient comicApiClient = new ComicApiClient(marvelApiConfig);
-                ComicsQuery query = ComicsQuery.Builder.create().withOffset(0).withLimit(10).build();
-                MarvelResponse<ComicsDto> all1 = comicApiClient.getAll(query);
-
-                //comicsDtos = all1.getResponse().getComics();
-
-                Log.e("Line_" + new Throwable().getStackTrace()[0].getLineNumber(), all1.toString());
-
-            /*
-            SeriesApiClient seriesApiClient = new SeriesApiClient(marvelApiConfig);
-            SeriesQuery query1 = SeriesQuery.Builder.create().withOffset(0).withLimit(10).build();
-            MarvelResponse<SeriesCollectionDto> all2 = seriesApiClient.getAll(query1);
-
-            Log.e("Line_"+new Throwable().getStackTrace()[0].getLineNumber(), all2.toString());*/
-
-            } catch (MarvelApiException e) {
-                e.printStackTrace();
-            }
             return null;
         }
 
