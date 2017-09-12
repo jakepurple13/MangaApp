@@ -13,11 +13,18 @@ import manga.mangaapp.manymanga.sites.implementations.english.Mangajoy;
 import manga.mangaapp.manymanga.sites.implementations.english.ReadMangaToday;
 import manga.mangaapp.manymanga.sites.implementations.english.Tapastic;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -28,6 +35,12 @@ public final class SiteHelper {
     private final static String implementationsPackage = "manga.mangaapp.manymanga.sites.implementations";
 
     private SiteHelper() {
+    }
+
+    public static List<Site> getSite(Site s) {
+        List<Site> sites = new LinkedList<>();
+        sites.add(s);
+        return sites;
     }
 
     public static List<Site> getSites() {
@@ -43,8 +56,8 @@ public final class SiteHelper {
 
             //sites.add(new MangaFox());
             //sites.add(new MangaHereEnglish());
-            sites.add(new ReadMangaToday());
-            //sites.add(new MangaReader());
+            //sites.add(new ReadMangaToday());
+            sites.add(new MangaReader());
             //sites.add(new KissManga());
             //sites.add(new LINEWebtoon());
             //sites.add(new Tapastic());
@@ -87,6 +100,34 @@ public final class SiteHelper {
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
         }
 
+        return null;
+    }
+
+    public static Site getSiter(String source) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+        Class x = Site.class;
+        Constructor[] constructors = x.getDeclaredConstructors();
+        Field[] fields = x.getDeclaredFields();
+        Method[] methods = x.getDeclaredMethods();
+        for (Constructor constructor : constructors) {
+            //constructors
+            Log.e("Line_"+new Throwable().getStackTrace()[0].getLineNumber(), constructor.getName());
+        }
+        for (Field field : fields) {
+            //fields
+            Log.e("Line_"+new Throwable().getStackTrace()[0].getLineNumber(), field.getName());
+        }
+        for (Method method : methods) {
+            //methods
+            Log.e("Line_"+new Throwable().getStackTrace()[0].getLineNumber(), method.getName());
+        }
+
+        for (Class<?> clazz : x.getClasses()) {
+            if (clazz.getSimpleName().equals(source)) {
+                Site s = (Site) clazz.getClassLoader().loadClass(source).newInstance();
+                Log.e("Line_"+new Throwable().getStackTrace()[0].getLineNumber(), Arrays.toString(s.getClass().getMethods()));
+                return s;
+            }
+        }
         return null;
     }
 }

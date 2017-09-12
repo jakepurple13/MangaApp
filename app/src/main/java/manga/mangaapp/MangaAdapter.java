@@ -5,12 +5,14 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
@@ -38,6 +40,7 @@ public class MangaAdapter extends RecyclerView.Adapter<MangaAdapter.ViewHolder>{
     int pageNumber = 0;
     int chapterNumber = 0;
     ChapterPage[] chaptersList;
+    Layouts layoutType;
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -47,20 +50,24 @@ public class MangaAdapter extends RecyclerView.Adapter<MangaAdapter.ViewHolder>{
         // each data item is just a string in this case
         public TextView mTextView;
         public ImageView imageView;
+        public TextView summary;
 
-        public ViewHolder(View v) {
+        public ViewHolder(View v, Layouts layouts) {
             super(v);
             mTextView = (TextView) v.findViewById(R.id.name);
             imageView = v.findViewById(R.id.imageButton);
+            if(layouts.equals(Layouts.DETAILS))
+                summary = v.findViewById(R.id.details);
         }
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
 
-    public MangaAdapter(ArrayList<Manga> myDataset, MainActivity in, MangaEdenClient client) {
+    public MangaAdapter(ArrayList<Manga> myDataset, MainActivity in, MangaEdenClient client, Layouts layoutType) {
         mDataset = myDataset;
         this.in = in;
         this.client = client;
+        this.layoutType = layoutType;
     }
 
     // Create new views (invoked by the layout manager)
@@ -68,18 +75,43 @@ public class MangaAdapter extends RecyclerView.Adapter<MangaAdapter.ViewHolder>{
     public MangaAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
                                                         int viewType) {
         // create a new view
-        View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.manga_detail_layout, parent, false);
+        View v = null;
+
+        switch (layoutType) {
+
+            case STAGGERED_THUMBNAILS:
+                v = LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.manga_detail_layout, parent, false);
+                break;
+
+            case THUMBNAILS:
+                v = LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.manga_detail_layout, parent, false);
+                break;
+
+            case DETAILS:
+                v = LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.manga_detailed_layout, parent, false);
+                break;
+
+        }
+
+
         // set the view's size, margins, paddings and layout parameters
 
-        ViewHolder vh = new ViewHolder(v);
+        ViewHolder vh = new ViewHolder(v, layoutType);
         return vh;
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return super.getItemViewType(position);
     }
 
     // Replace the contents of a view (invoked by the layout manager)
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, final int position) {
+    public void onBindViewHolder(final ViewHolder holder, final int position) {
 
         TextView tv = holder.mTextView;
         final ImageView ib = holder.imageView;
@@ -108,14 +140,33 @@ public class MangaAdapter extends RecyclerView.Adapter<MangaAdapter.ViewHolder>{
                         // Get chapter page image URLs
                         //final URI imageUrl = pages[0].getImageURI();
                         final URI imageUrl = MangaEden.manga2ImageURI(mangaDetails.getImage());
+                        final String detail = "\nChapter Count: " + chapters.length+"\n"+mangaDetails.getDescription();
                         Handler uiHandler = new Handler(Looper.getMainLooper());
                         uiHandler.post(new Runnable() {
                             @Override
                             public void run() {
+
+                                int width = 600;
+                                int height = 800;
+
+                                if(layoutType.equals(Layouts.DETAILS)) {
+                                    TextView details = holder.summary;
+                                    details.setText(detail);
+                                    width*=.5;
+                                    height*=.5;
+                                } else {
+                                    width*=.6;
+                                    height*=.6;
+                                }
+
                                 Picasso.with(in)
                                         .load(String.valueOf(imageUrl))
+                                        .resize(width, height)
+                                        .centerInside()
                                         .placeholder(android.R.mipmap.sym_def_app_icon)
                                         .into(ib);
+
+                                Help.e("IB STUFF", ib.getDrawable().getBounds().flattenToString());
                             }
                         });
                     } catch (ArrayIndexOutOfBoundsException e1) {
@@ -134,7 +185,7 @@ public class MangaAdapter extends RecyclerView.Adapter<MangaAdapter.ViewHolder>{
             }
         }).execute();
 
-        ib.setOnClickListener(new View.OnClickListener() {
+        View.OnClickListener onClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
@@ -143,7 +194,14 @@ public class MangaAdapter extends RecyclerView.Adapter<MangaAdapter.ViewHolder>{
                 in.startActivity(i);
 
             }
-        });
+        };
+
+        ib.setOnClickListener(onClickListener);
+        tv.setOnClickListener(onClickListener);
+        if(layoutType.equals(Layouts.DETAILS)) {
+            TextView details = holder.summary;
+            details.setOnClickListener(onClickListener);
+        }
 
     }
 
@@ -185,6 +243,7 @@ public class MangaAdapter extends RecyclerView.Adapter<MangaAdapter.ViewHolder>{
                                     .load(imageUrl)
                                     .placeholder(android.R.mipmap.sym_def_app_icon)
                                     .into(ib);
+
                         }
                     });
                 } catch (ArrayIndexOutOfBoundsException e1) {
@@ -211,6 +270,12 @@ public class MangaAdapter extends RecyclerView.Adapter<MangaAdapter.ViewHolder>{
     @Override
     public int getItemCount() {
         return mDataset.size();
+    }
+
+    public void notifyData(ArrayList<Manga> myList) {
+        Log.d("notifyData ", myList.size() + "");
+        this.mDataset = myList;
+        notifyDataSetChanged();
     }
 
 }

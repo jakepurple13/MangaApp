@@ -23,14 +23,14 @@ public class Manga {
   private final int status;
 
   @SerializedName("ld")
-  private final double lastChapterDate;
+  private final long lastChapterDate;
 
   @SerializedName("h")
   private final long hits;
 
 
   public Manga(String image, String title, String id, String alias, int status,
-               double lastChapterDate, long hits) {
+               long lastChapterDate, long hits) {
     this.image = image;
     this.title = title;
     this.id = id;
@@ -60,7 +60,7 @@ public class Manga {
     return status;
   }
 
-  public double getLastChapterDate() {
+  public long getLastChapterDate() {
     return lastChapterDate;
   }
 

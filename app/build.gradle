@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+//apply plugin: 'android-apt'
 
 android {
     compileSdkVersion 26
@@ -48,7 +49,18 @@ dependencies {
     compile 'com.mikepenz:ionicons-typeface:2.0.1.3@aar'
     compile 'com.mikepenz:pixeden-7-stroke-typeface:1.2.0.1@aar'
 
+    compile 'com.gdacciaro:iosdialog:1.0.2'
+    compile 'rebus:bottom-dialog:0.0.5'
+
     compile 'com.github.devlight:infinitecycleviewpager:1.0.2'
+    compile 'com.github.greenfrvr:hashtag-view:1.3.1'
+    compile 'com.github.adroitandroid:ChipCloud:2.2.1'
+    compile 'com.yarolegovich:lovely-dialog:1.0.7'
+    compile 'com.github.LorenzoZaccagnini:DroidTag:1.6'
+    compile 'com.cleveroad:fan-layout-manager:1.0.5'
+    compile 'jp.wasabeef:recyclerview-animators:2.2.7'
+
+    compile 'com.forcelain.awesomelayoutmanager:awesomelayoutmanager:1.0'
 
     compile 'com.github.jkwiecien:EasyImage:1.3.1'
     compile 'com.kingfisherphuoc:easy_sharedpreference_library:1.3'
@@ -60,16 +72,21 @@ dependencies {
     compile 'com.github.mancj:MaterialSearchBar:0.7.1'
     compile 'org.jsoup:jsoup:1.10.3'
 
+    compile 'com.truizlop.fabreveallayout:library:1.0.0'
+
     //compile group: 'com.thoughtworks.xstream', name: 'xstream', version: '1.4.10'
 
     compile "commons-io:commons-io:2.5"
+
+    //compile 'com.github.material-foundation.material-remixer-android:remixer:1.0'
+    //provided 'com.github.material-foundation.material-remixer-android:remixer_annotation:1.0'
 
     compile 'com.google.code.gson:gson:2.8.1'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'net.alhazmy13.Gota:libary:1.4.1'
     compile 'com.squareup.okhttp3:okhttp:3.8.1'
-    compile 'com.android.support:cardview-v7:26.0.1'
-    compile 'com.android.support:recyclerview-v7:26.0.1'
-    compile 'com.android.support:design:26.0.1'
+    compile 'com.android.support:cardview-v7:26+'
+    compile 'com.android.support:recyclerview-v7:26+'
+    compile 'com.android.support:design:26+'
     testCompile 'junit:junit:4.12'
 }

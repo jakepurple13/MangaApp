@@ -18,6 +18,7 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 import manga.mangaapp.AsyncTasks;
@@ -131,7 +132,20 @@ public class MangaInfoActivity extends AppCompatActivity {
 
                 chapterListAdapter = new ChapterListAdapter(chapters, MangaInfoActivity.this);
                 mRecyclerView.setAdapter(chapterListAdapter);
-                title.setText(mangaDetails.getTitle());
+                String titleText = mangaDetails.getTitle() + "\nTags: ";
+
+                String[] cat =  mangaDetails.getCategories();
+
+                for(String s : cat) {
+                    titleText+=s+"\t";
+                }
+
+                //Date date = new Date();
+                //date.setTime(mangaDetails.getCreated());
+
+                //titleText+="\nCreated:"+date;
+
+                title.setText(titleText);
                 description.setText(mangaDetails.getDescription());
             }
         }).execute();
