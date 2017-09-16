@@ -2,9 +2,11 @@ package manga.mangaapp.manymanga.sites;
 
 import android.util.Log;
 
+import manga.mangaapp.MangaSide.GenreTags;
 import manga.mangaapp.manymanga.helpers.ClassesInPackageHelper;
 import manga.mangaapp.manymanga.sites.implementations.english.KissManga;
 import manga.mangaapp.manymanga.sites.implementations.english.LINEWebtoon;
+import manga.mangaapp.manymanga.sites.implementations.english.MangaEdenEnglish;
 import manga.mangaapp.manymanga.sites.implementations.english.MangaFox;
 import manga.mangaapp.manymanga.sites.implementations.english.MangaHereEnglish;
 import manga.mangaapp.manymanga.sites.implementations.english.MangaPanda;
@@ -130,4 +132,46 @@ public final class SiteHelper {
         }
         return null;
     }
+
+    public static Site getEnglishSiteFromString(GenreTags.Sources tag) {
+
+        Site currentSite;
+
+        switch (tag) {
+            case TAPASTIC:
+                currentSite = new Tapastic();
+                break;
+            case READMANGATODAY:
+                currentSite = new ReadMangaToday();
+                break;
+            case MANGAREADER:
+                currentSite = new MangaReader();
+                break;
+            case MANGAPANDA:
+                currentSite = new MangaPanda();
+                break;
+            case MANGAJOY:
+                currentSite = new Mangajoy();
+                break;
+            case MANGAHERE:
+                currentSite = new MangaHereEnglish();
+                break;
+            case MANGAFOX:
+                currentSite = new MangaFox();
+                break;
+            case LINEWEBTOON:
+                currentSite = new LINEWebtoon();
+                break;
+            case KISSMANGA:
+                currentSite = new KissManga();
+                break;
+            default:
+                currentSite = new MangaReader();
+                break;
+        }
+
+        return currentSite;
+
+    }
+
 }

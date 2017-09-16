@@ -21,7 +21,9 @@
             </intent-filter>
         </activity>
         <activity android:name=".MangaSide.MangaInfoActivity" />
+        <activity android:name=".MangaSide.MangaSiteInfoActivity" />
         <activity android:name=".MangaSide.ReadManga" />
+        <activity android:name=".MangaSide.ReadMangaSite" />
     </application>
 
 </manifest>

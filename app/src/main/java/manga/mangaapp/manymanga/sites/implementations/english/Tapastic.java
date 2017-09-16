@@ -2,6 +2,8 @@ package manga.mangaapp.manymanga.sites.implementations.english;
 
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
+
+import manga.mangaapp.Help;
 import manga.mangaapp.manymanga.data.Chapter;
 import manga.mangaapp.manymanga.data.Image;
 import manga.mangaapp.manymanga.data.Manga;
@@ -116,6 +118,52 @@ public class Tapastic implements Site {
         }
 
         return imageLinks;
+    }
+
+    @Override
+    public String getChapterCoverLink(Chapter chapter) throws Exception {
+        List<Image> imageLinks = new LinkedList<>();
+
+        String referrer = url + "/episode/" + chapter.getLink();
+        Document doc = JsoupHelper.getHTMLPage(referrer);
+
+        // Get pages linkes
+        Elements images = doc.select("article[class^=ep-contents]").first()
+                .select("img[class=art-image]");
+
+        for (Element image : images) {
+            String link = image.attr("src");
+            String extension = link.substring(link.length() - 3, link.length());
+
+            imageLinks.add(new Image(link, referrer, extension));
+            return link;
+        }
+
+        return "";
+    }
+
+    @Override
+    public String getMangaSummary(Manga manga) throws Exception {
+        String summary = "";
+
+        Document doc = JsoupHelper.getHTMLPage(manga.getLink());
+        //Help.v(doc.html());
+        Elements rows = doc.select("li").addClass("list-group-item movie-detail");
+        Help.v(rows.text());
+        summary = rows.text();
+
+        return summary;
+    }
+
+    @Override
+    public String coverURL(Manga manga) throws Exception {
+        Document doc = JsoupHelper.getHTMLPage(manga.getLink());
+
+        Elements rows = doc.select("div[class=col-md-3]").select("img").addClass("img-responsive");
+
+        Help.e(rows.attr("src"));
+
+        return rows.attr("src");
     }
 
     @Override

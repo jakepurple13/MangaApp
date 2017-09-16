@@ -59,6 +59,8 @@ dependencies {
     compile 'com.github.LorenzoZaccagnini:DroidTag:1.6'
     compile 'com.cleveroad:fan-layout-manager:1.0.5'
     compile 'jp.wasabeef:recyclerview-animators:2.2.7'
+    compile 'com.hkm.taglib:tag:1.7.1'
+    compile 'info.guardianproject.netcipher:netcipher:2.0.0-alpha1'
 
     compile 'com.forcelain.awesomelayoutmanager:awesomelayoutmanager:1.0'
 

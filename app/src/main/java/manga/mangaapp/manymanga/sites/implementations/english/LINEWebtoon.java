@@ -1,5 +1,6 @@
 package manga.mangaapp.manymanga.sites.implementations.english;
 
+import manga.mangaapp.Help;
 import manga.mangaapp.manymanga.data.Chapter;
 import manga.mangaapp.manymanga.data.Image;
 import manga.mangaapp.manymanga.data.Manga;
@@ -84,6 +85,56 @@ public class LINEWebtoon implements Site {
         }
 
         return imageLinks;
+    }
+
+    @Override
+    public String getChapterCoverLink(Chapter chapter) throws Exception {
+        List<Image> imageLinks = new LinkedList<>();
+
+        String referrer = chapter.getLink();
+        Document doc = JsoupHelper.getHTMLPage(referrer);
+
+        // Get pages linkes
+        Elements images = doc.select("img[class=_images]");
+
+        for (Element image : images) {
+            String link = image.attr("data-url");
+            String extension = link.substring(link.length() - 12,
+                    link.length() - 9);
+
+            imageLinks.add(new Image(link, referrer, extension));
+            return link;
+        }
+
+        return "";
+    }
+
+    public String getMangaSummary(Manga manga) throws Exception {
+        String summary = "";
+
+        Document doc = JsoupHelper.getHTMLPage(manga.getLink());
+        //Help.v(doc.html());
+        Elements rows = doc.select("div[id=_asideDetail]").select("p[class=summary]");
+        Help.v(rows.text());
+        summary = rows.text();
+
+        return summary;
+    }
+
+    @Override
+    public String coverURL(Manga manga) throws Exception {
+
+        String url = "";
+
+        Document doc = JsoupHelper.getHTMLPage(manga.getLink());
+
+        Elements rows = doc.select("ul[id=_listUl]").select("span[class=thmb]").
+                select("img");
+
+        Help.e(rows.attr("src"));
+        url = rows.attr("src");
+
+        return url;
     }
 
     @Override

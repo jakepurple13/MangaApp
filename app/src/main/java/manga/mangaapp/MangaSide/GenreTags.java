@@ -58,7 +58,7 @@ public class GenreTags {
         GENDER_BENDER("Gender Bender"),
         HAREM("Harem"),
         HISTORICAL("Historical"),
-        HORROR("Horro"),
+        HORROR("Horror"),
         JOSEI("Josei"),
         MARTIAL_ARTS("Martial Arts"),
         MATURE("Mature"),
@@ -159,16 +159,16 @@ public class GenreTags {
 
     public static String[] getAllSources() {
         return new String[]{
-                Sources.KISSMANGA.source,
+                //Sources.KISSMANGA.source,
                 Sources.LINEWEBTOON.source,
                 Sources.MANGAEDEN.source,
                 Sources.MANGAFOX.source,
                 Sources.MANGAHERE.source,
-                Sources.MANGAJOY.source,
+                //Sources.MANGAJOY.source,
                 Sources.MANGAPANDA.source,
                 Sources.MANGAREADER.source,
                 Sources.READMANGATODAY.source,
-                Sources.TAPASTIC.source
+                //Sources.TAPASTIC.source
         };
     }
 

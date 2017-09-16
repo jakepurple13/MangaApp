@@ -1,5 +1,6 @@
 package manga.mangaapp.manymanga.sites.extend;
 
+import manga.mangaapp.Help;
 import manga.mangaapp.manymanga.data.Chapter;
 import manga.mangaapp.manymanga.data.Image;
 import manga.mangaapp.manymanga.data.Manga;
@@ -130,6 +131,62 @@ public class MangaHere implements Site {
         }
 
         return images;
+    }
+
+    @Override
+    public String getChapterCoverLink(Chapter chapter) throws Exception {
+        List<Image> images = new LinkedList<>();
+
+        String referrer = chapter.getLink();
+        Document doc = JsoupHelper.getHTMLPage(referrer);
+
+        Elements nav = doc.select("select[onchange=change_page(this)]").first()
+                .select("option");
+
+        for (Element page : nav) {
+            if (page != nav.first()) {
+                referrer = page.attr("value");
+                if (!referrer.startsWith("http://")) {
+                    // TODO: CHECK THIS!
+                    referrer = url + referrer;
+                }
+                doc = JsoupHelper.getHTMLPage(referrer);
+            }
+
+            String link = doc.select("img[id=image]").first().attr("src");
+            String linkTemp = link.split("\\?v=")[0];
+            String extension = linkTemp.substring(linkTemp.length() - 3,
+                    linkTemp.length());
+
+            images.add(new Image(link, referrer, extension));
+            return link;
+        }
+
+        return "";
+    }
+
+    @Override
+    public String coverURL(Manga manga) throws Exception {
+        Document doc = JsoupHelper.getHTMLPage(manga.getLink());
+
+        Elements rows = doc.select("img").addClass("img");//first().select("img");
+
+        Help.e(rows.attr("src"));
+
+        return rows.attr("src");
+    }
+
+    @Override
+    public String getMangaSummary(Manga manga) throws Exception {
+        String summary = "";
+
+        Document doc = JsoupHelper.getHTMLPage(manga.getLink());
+        //Help.v(doc.html());
+        Elements rows = doc.select("p[id=hide]");//.first().select("p");
+        Help.v(rows.text());
+        summary = rows.text();
+
+        return summary;
     }
 
     @Override

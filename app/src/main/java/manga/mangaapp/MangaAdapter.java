@@ -205,67 +205,6 @@ public class MangaAdapter extends RecyclerView.Adapter<MangaAdapter.ViewHolder>{
 
     }
 
-    class RetrieveManga extends AsyncTask<String, Void, Boolean> {
-
-        ImageView ib;
-        Manga manga;
-
-        public RetrieveManga(Manga m, ImageView ImageView) {
-            this.manga = m;
-            ib = ImageView;
-        }
-
-        @Override
-        protected void onPreExecute() {
-
-        }
-
-        @Override
-        protected Boolean doInBackground(String... urls) {
-            try {
-                // Get manga details
-                MangaDetails mangaDetails = client.getMangaDetails(manga.getId());
-                Chapter[] chapters = mangaDetails.getChapters();
-                try {
-
-                    // Get chapter details
-                    /*ChapterDetails chapterDetails = client.getChapterDetails(chapters[0].getId());
-                    ChapterPage[] pages = chapterDetails.getPages();
-                    chaptersList = pages;*/
-                    // Get chapter page image URLs
-                    //final URI imageUrl = pages[0].getImageURI();
-                    final String imageUrl = mangaDetails.getImage();
-                    Handler uiHandler = new Handler(Looper.getMainLooper());
-                    uiHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            Picasso.with(in)
-                                    .load(imageUrl)
-                                    .placeholder(android.R.mipmap.sym_def_app_icon)
-                                    .into(ib);
-
-                        }
-                    });
-                } catch (ArrayIndexOutOfBoundsException e1) {
-                    e1.printStackTrace();
-                }
-
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(final Boolean success) {
-            super.onPostExecute(success);
-            // TODO: check this.exception
-            // TODO: do something with the feed
-
-        }
-    }
-
     // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {
@@ -275,7 +214,14 @@ public class MangaAdapter extends RecyclerView.Adapter<MangaAdapter.ViewHolder>{
     public void notifyData(ArrayList<Manga> myList) {
         Log.d("notifyData ", myList.size() + "");
         this.mDataset = myList;
-        notifyDataSetChanged();
+        //notifyItemInserted(mDataset.size()-1);
+        Handler uiHandler = new Handler(Looper.getMainLooper());
+        uiHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                notifyItemInserted(mDataset.size()-1);
+            }
+        });
     }
 
 }

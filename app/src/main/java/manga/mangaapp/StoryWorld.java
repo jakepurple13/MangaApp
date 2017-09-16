@@ -6,11 +6,15 @@ import android.support.multidex.MultiDex;
 
 import com.kingfisher.easy_sharedpreference_library.SharedPreferencesManager;
 
+import manga.mangaapp.manymanga.sites.Site;
+
 /**
  * Created by Jacob on 8/23/17.
  */
 
 public class StoryWorld extends Application {
+
+    static Site site;
 
     @Override
     public void onCreate() {
@@ -23,4 +27,13 @@ public class StoryWorld extends Application {
         super.attachBaseContext(base);
         MultiDex.install(this);
     }
+
+    public static void setSite(Site s) {
+        site = s;
+    }
+
+    public static Site getSite() {
+        return site;
+    }
+
 }

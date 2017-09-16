@@ -1,5 +1,6 @@
 package manga.mangaapp.manymanga.sites.extend;
 
+import manga.mangaapp.Help;
 import manga.mangaapp.manymanga.data.Chapter;
 import manga.mangaapp.manymanga.data.Image;
 import manga.mangaapp.manymanga.data.Manga;
@@ -136,6 +137,52 @@ public class FoOlSlide implements Site {
         }
 
         return images;
+    }
+
+    @Override
+    public String getChapterCoverLink(Chapter chapter) throws Exception {
+        List<Image> images = new LinkedList<>();
+
+        String referrer = chapter.getLink();
+        Document doc = JsoupHelper.getHTMLPageWithPost(referrer, post);
+
+        int pages = Integer.parseInt(doc
+                .select("div[class=tbtitle dropdown_parent dropdown_right]")
+                .first().select("div[class=text]").first().text()
+                .replaceFirst("\\D*(\\d*).*", "$1"));
+
+        for (int i = 1; i <= pages; i++) {
+            if (i != 1) {
+                referrer = chapter.getLink() + "page/" + i;
+                doc = JsoupHelper.getHTMLPageWithPost(referrer, post);
+            }
+
+            String link = doc.select("img[class=open]").first().attr("src");
+            String extension = link.substring(link.length() - 3, link.length());
+
+            images.add(new Image(link, referrer, extension));
+            return link;
+        }
+
+        return "";
+    }
+
+    @Override
+    public String getMangaSummary(Manga manga) throws Exception {
+        String summary = "";
+
+        Document doc = JsoupHelper.getHTMLPage(url + manga.getLink());
+        Help.v(doc.html());
+        Elements rows = doc.select("div[id=readmangasum]").first().select("p");
+        Help.v(rows.text());
+        summary = rows.text();
+
+        return summary;
+    }
+
+    @Override
+    public String coverURL(Manga manga) throws Exception {
+        return null;
     }
 
     @Override

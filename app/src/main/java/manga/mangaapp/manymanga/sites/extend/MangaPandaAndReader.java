@@ -1,5 +1,6 @@
 package manga.mangaapp.manymanga.sites.extend;
 
+import manga.mangaapp.Help;
 import manga.mangaapp.manymanga.data.Chapter;
 import manga.mangaapp.manymanga.data.Image;
 import manga.mangaapp.manymanga.data.Manga;
@@ -60,6 +61,9 @@ public class MangaPandaAndReader implements Site {
         Elements rows = doc.select("div[id=chapterlist]").first().select("tr");
 
         for (Element row : rows) {
+
+            Help.v(row.toString());
+
             if (row.select("a").first() == null) {
                 continue;
             }
@@ -71,6 +75,30 @@ public class MangaPandaAndReader implements Site {
         Collections.reverse(chapters);
 
         return chapters;
+    }
+
+    @Override
+    public String getMangaSummary(Manga manga) throws Exception {
+        String summary = "";
+
+        Document doc = JsoupHelper.getHTMLPage(url + manga.getLink());
+        Help.v(doc.html());
+        Elements rows = doc.select("div[id=readmangasum]").first().select("p");
+        Help.v(rows.text());
+        summary = rows.text();
+
+        return summary;
+    }
+
+    @Override
+    public String coverURL(Manga manga) throws Exception {
+        Document doc = JsoupHelper.getHTMLPage(url + manga.getLink());
+
+        Elements rows = doc.select("div[id=mangaimg]").first().select("img");
+
+        Help.e(rows.text());
+
+        return rows.attr("src");
     }
 
     @Override
@@ -89,6 +117,7 @@ public class MangaPandaAndReader implements Site {
             if (i != 0) {
                 referrer = url + nav.get(i).attr("value");
                 doc = JsoupHelper.getHTMLPage(referrer);
+                //Help.v(referrer);
             }
 
             String link = doc.select("img[id=img]").first().attr("src");
@@ -98,6 +127,33 @@ public class MangaPandaAndReader implements Site {
         }
 
         return images;
+    }
+
+    public String getChapterCoverLink(Chapter chapter) throws Exception {
+        List<Image> images = new LinkedList<>();
+
+        String referrer = url + chapter.getLink();
+        Document doc = JsoupHelper.getHTMLPage(referrer);
+
+        Elements nav = doc.select("select[id=pageMenu]").first()
+                .select("option");
+
+        int pages = nav.size();
+
+        for (int i = 0; i < pages; i++) {
+            if (i != 0) {
+                referrer = url + nav.get(i).attr("value");
+                doc = JsoupHelper.getHTMLPage(referrer);
+                //Help.v(referrer);
+            }
+
+            String link = doc.select("img[id=img]").first().attr("src");
+            String extension = link.substring(link.length() - 3, link.length());
+            return link;
+            //images.add(new Image(link, referrer, extension));
+        }
+
+        return "";
     }
 
     @Override

@@ -16,13 +16,17 @@ import com.squareup.picasso.Picasso;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import manga.mangaapp.MangaSide.MangaInfoActivity;
+import manga.mangaapp.MangaSide.MangaSiteInfoActivity;
 import manga.mangaapp.manymanga.data.Chapter;
 import manga.mangaapp.manymanga.data.Image;
 import manga.mangaapp.manymanga.data.Manga;
 import manga.mangaapp.manymanga.sites.Site;
+import manga.mangaapp.manymanga.sites.SiteHelper;
+import manga.mangaapp.manymanga.sites.implementations.english.MangaReader;
 import me.anshulagarwal.expandablemenuoption.ExpandableMenuView;
 
 
@@ -30,7 +34,7 @@ import me.anshulagarwal.expandablemenuoption.ExpandableMenuView;
  * Created by Jacob on 8/17/17.
  */
 
-public class Manga2Adapter extends RecyclerView.Adapter<Manga2Adapter.ViewHolder>{
+public class Manga2Adapter extends RecyclerView.Adapter<Manga2Adapter.ViewHolder> {
     //The list of contacts
     private ArrayList<Manga> mDataset;
     //Contact activity
@@ -39,6 +43,7 @@ public class Manga2Adapter extends RecyclerView.Adapter<Manga2Adapter.ViewHolder
     int chapterNumber = 0;
     Chapter[] chaptersList;
     Site sites;
+    Layouts layoutType;
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -48,44 +53,69 @@ public class Manga2Adapter extends RecyclerView.Adapter<Manga2Adapter.ViewHolder
         // each data item is just a string in this case
         public TextView mTextView;
         public ImageView imageView;
+        public TextView summary;
 
-        public ViewHolder(View v) {
+        public ViewHolder(View v, Layouts layouts) {
             super(v);
             mTextView = (TextView) v.findViewById(R.id.name);
             imageView = v.findViewById(R.id.imageButton);
+            if (layouts.equals(Layouts.DETAILS))
+                summary = v.findViewById(R.id.details);
         }
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
 
-    public Manga2Adapter(ArrayList<Manga> myDataset, MainActivity in, Site siteList) {
+    public Manga2Adapter(ArrayList<Manga> myDataset, MainActivity in, Site siteList, Layouts layoutType) {
         mDataset = myDataset;
         this.in = in;
         sites = siteList;
+        this.layoutType = layoutType;
+
     }
 
-    public Manga2Adapter(ArrayList<Manga> myDataset, MainActivity in) {
+    public Manga2Adapter(ArrayList<Manga> myDataset, MainActivity in, Layouts layoutType) {
         mDataset = myDataset;
         this.in = in;
+        this.layoutType = layoutType;
     }
 
     // Create new views (invoked by the layout manager)
     @Override
     public Manga2Adapter.ViewHolder onCreateViewHolder(ViewGroup parent,
-                                                      int viewType) {
-        // create a new view
-        View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.manga_detail_layout, parent, false);
+                                                       int viewType) {
+        View v = null;
+
+        switch (layoutType) {
+
+            case STAGGERED_THUMBNAILS:
+                v = LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.manga_detail_layout, parent, false);
+                break;
+
+            case THUMBNAILS:
+                v = LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.manga_detail_layout, parent, false);
+                break;
+
+            case DETAILS:
+                v = LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.manga_detailed_layout, parent, false);
+                break;
+
+        }
+
+
         // set the view's size, margins, paddings and layout parameters
 
-        ViewHolder vh = new ViewHolder(v);
+        Manga2Adapter.ViewHolder vh = new Manga2Adapter.ViewHolder(v, layoutType);
         return vh;
     }
 
     // Replace the contents of a view (invoked by the layout manager)
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, final int position) {
+    public void onBindViewHolder(final ViewHolder holder, final int position) {
 
         TextView tv = holder.mTextView;
         final ImageView ib = holder.imageView;
@@ -103,33 +133,64 @@ public class Manga2Adapter extends RecyclerView.Adapter<Manga2Adapter.ViewHolder
                 @Override
                 public boolean doInBackground() {
 
-                    List<Chapter> c;
-                    List<Image> images = null;
-
+                    String cover = null;
+                    Help.i(Arrays.toString(mDataset.toArray()));
                     try {
-                        c = sites.getChapterList(mDataset.get(position));
-                        images = sites.getChapterImageLinks(c.get(0));
+                        cover = sites.coverURL(mDataset.get(position));
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
 
+                    String des = null;
+
                     try {
+                        des = sites.getMangaSummary(mDataset.get(position));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        des = "N/A";
+                    }
 
-                        final String imageUrl = images.get(0).getLink();
+                    final String finalCover = cover;
+                    final String finalDes = des;
 
-                        Handler uiHandler = new Handler(Looper.getMainLooper());
-                        uiHandler.post(new Runnable() {
-                            @Override
-                            public void run() {
+                    Handler uiHandler = new Handler(Looper.getMainLooper());
+                    uiHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+
+                            int width = 600;
+                            int height = 800;
+
+                            if (layoutType.equals(Layouts.DETAILS)) {
+                                TextView details = holder.summary;
+                                details.setText(finalDes);
+                                width *= .5;
+                                height *= .5;
+                            } else {
+                                width *= .6;
+                                height *= .6;
+                            }
+
+                            try {
+
+                                Help.v(finalCover);
+
                                 Picasso.with(in)
-                                        .load(imageUrl)
+                                        .load(finalCover)
+                                        .resize(width, height)
+                                        .centerInside()
                                         .placeholder(android.R.mipmap.sym_def_app_icon)
                                         .into(ib);
+
+                            } catch (Exception e) {
+                                e.printStackTrace();
                             }
-                        });
-                    } catch(Exception e) {
-                        e.printStackTrace();
-                    }
+
+                            Help.e("IB STUFF", ib.getDrawable().getBounds().flattenToString());
+                        }
+                    });
+
+
                     return true;
                 }
 
@@ -139,7 +200,7 @@ public class Manga2Adapter extends RecyclerView.Adapter<Manga2Adapter.ViewHolder
                 }
             }).execute();
 
-        } catch(NullPointerException e) {
+        } catch (NullPointerException e) {
             e.printStackTrace();
         }
 
@@ -147,8 +208,11 @@ public class Manga2Adapter extends RecyclerView.Adapter<Manga2Adapter.ViewHolder
             @Override
             public void onClick(View view) {
 
-                Intent i = new Intent(in, MangaInfoActivity.class);
-                i.putExtra("manga_id", mDataset.get(0).getLink());
+                Intent i = new Intent(in, MangaSiteInfoActivity.class);
+                StoryWorld.setSite(sites);
+                i.putExtra("manga_link", mDataset.get(position).getLink());
+                i.putExtra("manga_title", mDataset.get(position).getTitle());
+                i.putExtra("manga_source", sites.getName());
                 in.startActivity(i);
 
             }

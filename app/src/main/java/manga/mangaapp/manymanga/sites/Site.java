@@ -17,6 +17,12 @@ public interface Site {
 
     public List<Image> getChapterImageLinks(Chapter chapter) throws Exception;
 
+    public String getChapterCoverLink(Chapter chapter) throws Exception;
+
+    public String getMangaSummary(Manga manga) throws Exception;
+
+    public String coverURL(Manga manga) throws Exception;
+
     public String getName();
 
     public String getUrl();

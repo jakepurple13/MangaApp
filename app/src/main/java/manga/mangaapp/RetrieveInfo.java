@@ -16,20 +16,20 @@ public class RetrieveInfo extends AsyncTask<String, Void, Boolean> {
 
     @Override
     protected void onPreExecute() {
+        //do something before starting
         asyncTasks.onPreExecute();
     }
 
     @Override
     protected Boolean doInBackground(String... urls) {
-
+        //do in background
         return asyncTasks.doInBackground();
     }
 
     @Override
     protected void onPostExecute(final Boolean success) {
         super.onPostExecute(success);
-        // TODO: check this.exception
-        // TODO: do something with the feed
+        // do something with the feed
         asyncTasks.onPostExecute(success);
     }
 

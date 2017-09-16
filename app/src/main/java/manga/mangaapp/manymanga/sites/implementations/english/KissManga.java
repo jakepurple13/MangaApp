@@ -1,5 +1,6 @@
 package manga.mangaapp.manymanga.sites.implementations.english;
 
+import manga.mangaapp.Help;
 import manga.mangaapp.manymanga.data.Chapter;
 import manga.mangaapp.manymanga.data.Image;
 import manga.mangaapp.manymanga.data.ImageType;
@@ -31,9 +32,17 @@ public class KissManga implements Site {
 
         Document doc = JsoupHelper.getHTMLPage(url + "/MangaList");
 
-        int numberOfPages = Integer.parseInt(doc
-                .select("div[class=pagination pagination-left]").first()
-                .select("li").last().select("a").attr("page"));
+        Help.d(doc.html());
+
+        Elements elements = doc.select("div[class=pagination pagination-left]").first().select("li");
+
+        Help.d(elements.html());
+
+        String num = elements.last().select("a").attr("page");
+
+        Help.d(num);
+
+        int numberOfPages = Integer.parseInt(num);
 
         for (int page = 1; page <= numberOfPages; page++) {
             if (page != 1) {
@@ -122,6 +131,73 @@ public class KissManga implements Site {
         }
 
         return images;
+    }
+
+    @Override
+    public String getChapterCoverLink(Chapter chapter) throws Exception {
+        List<Image> images = new LinkedList<>();
+
+        String referrer = url + chapter.getLink();
+        Document doc = JsoupHelper.getHTMLPage(referrer);
+
+        Elements scripts = doc.select("script");
+
+        for (Element script : scripts) {
+            String scriptText = script.html();
+
+            if (scriptText.contains("var lstImages = new Array();")) {
+                try (Scanner scanner = new Scanner(scriptText)) {
+                    while (scanner.hasNextLine()) {
+                        String line = scanner.nextLine();
+
+                        if (line.contains("lstImages.push")) {
+                            String link = line.split("lstImages\\.push\\(\"")[1];
+
+                            if (link.contains("?imgmax")) {
+                                link = link.split("\\?imgmax")[0];
+                            } else {
+                                link = link.split("\"\\);")[0];
+                            }
+
+                            String extension = link.substring(
+                                    link.length() - 3, link.length());
+
+                            images.add(new Image(link + "?imgmax=9999",
+                                    referrer, extension, ImageType.HTMLUNIT));
+                            return link;
+                        }
+                    }
+                }
+
+                break;
+            }
+        }
+
+        return "";
+    }
+
+    @Override
+    public String getMangaSummary(Manga manga) throws Exception {
+
+        String referrer = url + manga.getLink();
+        Document doc = JsoupHelper.getHTMLPage(referrer);
+
+        Elements row = doc.select("div").addClass("barContent");
+
+        String summary = row.last().previousElementSibling().text();
+
+        return summary;
+    }
+
+    @Override
+    public String coverURL(Manga manga) throws Exception {
+
+        String referrer = url + manga.getLink();
+        Document doc = JsoupHelper.getHTMLPage(referrer);
+
+        Elements row = doc.select("div").addClass("barContent").first().select("img");
+
+        return row.attr("src");
     }
 
     @Override

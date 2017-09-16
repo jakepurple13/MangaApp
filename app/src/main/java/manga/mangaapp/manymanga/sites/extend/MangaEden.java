@@ -1,5 +1,6 @@
 package manga.mangaapp.manymanga.sites.extend;
 
+import manga.mangaapp.Help;
 import manga.mangaapp.manymanga.data.Chapter;
 import manga.mangaapp.manymanga.data.Image;
 import manga.mangaapp.manymanga.data.Manga;
@@ -106,6 +107,54 @@ public class MangaEden implements Site {
         }
 
         return images;
+    }
+
+    @Override
+    public String getChapterCoverLink(Chapter chapter) throws Exception {
+        List<Image> images = new LinkedList<>();
+
+        String referrer = chapter.getLink();
+        Document doc = JsoupHelper.getHTMLPage(referrer);
+
+        Elements nav = doc.select("div[class^=pagination]").first().select("a");
+
+        int pages = Integer.parseInt(nav.get(nav.size() - 2).text());
+
+        for (int i = 1; i <= pages; i++) {
+            if (i != 1) {
+                referrer = chapter.getLink().substring(0,
+                        chapter.getLink().length() - 2)
+                        + i + "/";
+                doc = JsoupHelper.getHTMLPage(referrer);
+            }
+
+            String link = doc.select("img[id=mainImg]").first().attr("src")
+                    .replace("//", "http://");
+            String extension = link.substring(link.length() - 3, link.length());
+
+            images.add(new Image(link, referrer, extension));
+            return link;
+        }
+
+        return "";
+    }
+
+    @Override
+    public String getMangaSummary(Manga manga) throws Exception {
+        String summary = "";
+
+        Document doc = JsoupHelper.getHTMLPage(url + manga.getLink());
+        Help.v(doc.html());
+        Elements rows = doc.select("div[id=readmangasum]").first().select("p");
+        Help.v(rows.text());
+        summary = rows.text();
+
+        return summary;
+    }
+
+    @Override
+    public String coverURL(Manga manga) throws Exception {
+        return null;
     }
 
     @Override

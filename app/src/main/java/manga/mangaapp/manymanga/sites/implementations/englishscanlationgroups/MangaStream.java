@@ -97,6 +97,21 @@ public class MangaStream implements Site {
     }
 
     @Override
+    public String getChapterCoverLink(Chapter chapter) throws Exception {
+        return null;
+    }
+
+    @Override
+    public String getMangaSummary(Manga manga) throws Exception {
+        return null;
+    }
+
+    @Override
+    public String coverURL(Manga manga) throws Exception {
+        return null;
+    }
+
+    @Override
     public String getName() {
         return name;
     }

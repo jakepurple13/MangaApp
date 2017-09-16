@@ -1,5 +1,6 @@
 package manga.mangaapp.manymanga.sites.implementations.english;
 
+import manga.mangaapp.Help;
 import manga.mangaapp.manymanga.data.Chapter;
 import manga.mangaapp.manymanga.data.Image;
 import manga.mangaapp.manymanga.data.Manga;
@@ -93,6 +94,61 @@ public class MangaFox implements Site {
         }
 
         return images;
+    }
+
+    @Override
+    public String getChapterCoverLink(Chapter chapter) throws Exception {
+        List<Image> images = new LinkedList<>();
+
+        String referrer = chapter.getLink().endsWith("1.html") ? chapter
+                .getLink() : chapter.getLink() + "1.html";
+        Document doc = JsoupHelper.getHTMLPage(referrer);
+
+        Elements nav = doc.select("select[onchange=change_page(this)]").first()
+                .select("option");
+
+        int pages = nav.size() - 1;
+
+        for (int i = 1; i <= pages; i++) {
+            if (i != 1) {
+                referrer = chapter.getLink().replace("1.html", "") + i
+                        + ".html";
+                doc = JsoupHelper.getHTMLPage(referrer);
+            }
+
+            String link = doc.select("img[id=image]").first().attr("src");
+            String extension = link.substring(link.length() - 3, link.length());
+
+            images.add(new Image(link, referrer, extension));
+            return link;
+        }
+
+        return "";
+    }
+
+    @Override
+    public String coverURL(Manga manga) throws Exception {
+        Document doc = JsoupHelper.getHTMLPage(manga.getLink());
+
+        //Elements rows = doc.select("div").addClass("cover").select("img");
+        Elements rows = doc.select("div[id=series_info]").select("div").addClass("cover").select("img");
+
+        Help.e(rows.attr("src"));
+
+        return rows.attr("src");
+    }
+
+    @Override
+    public String getMangaSummary(Manga manga) throws Exception {
+        String summary = "";
+        //Help.v(manga.getLink());
+        Document doc = JsoupHelper.getHTMLPage(manga.getLink());
+        //Help.v(doc.html());
+        Elements rows = doc.select("div[id=title]").first().select("p");
+        //Help.v(rows.text());
+        summary = rows.text();
+
+        return summary;
     }
 
     @Override

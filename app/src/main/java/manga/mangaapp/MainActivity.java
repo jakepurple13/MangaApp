@@ -11,6 +11,7 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -24,6 +25,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.SpannableString;
 import android.text.Spanned;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.SuperscriptSpan;
@@ -72,15 +74,28 @@ import com.yarolegovich.lovelydialog.LovelyCustomDialog;
 import net.alhazmy13.gota.Gota;
 import net.alhazmy13.gota.GotaResponse;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.Executor;
 
+import javax.net.ssl.HttpsURLConnection;
+
+import co.hkm.soltag.LayouMode;
+import co.hkm.soltag.TagContainerLayout;
+import co.hkm.soltag.TagView;
+import info.guardianproject.netcipher.NetCipher;
 import jp.wasabeef.recyclerview.adapters.SlideInLeftAnimationAdapter;
 import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
 import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
@@ -348,7 +363,7 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
         }).execute();
     }
 
-    public void showChipDialog(int iconId, String title, String message, final String[] chipsToUse, final View.OnClickListener yesClick, final boolean sourceOrGenre, final TagGroup.OnTagClickListener tagListener) {
+    public void showChipDialog(int iconId, String title, String message, final String[] chipsToUse, final View.OnClickListener yesClick, final boolean sourceOrGenre, final TagView.OnTagClickListener listener) {
         final LovelyCustomDialog customDialog = new LovelyCustomDialog(MainActivity.this)
                 .setView(R.layout.genre_choose_layout)
                 .setTopColorRes(R.color.md_blue_A400)
@@ -362,7 +377,7 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
             @Override
             public void configureView(View v) {
 
-                TagGroup tagGroup = v.findViewById(R.id.tag_group);
+                /*TagGroup tagGroup = v.findViewById(R.id.tag_group);
 
                 tagGroup.setTags(chipsToUse);
 
@@ -372,7 +387,27 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
                         tagListener.onTagClick(tag);
                         customDialog.dismiss();
                     }
+                });*/
+
+                final TagContainerLayout mTagContainerLayout = (TagContainerLayout) v.findViewById(R.id.tag_group);
+
+                mTagContainerLayout.setOnTagClickListener(new TagView.OnTagClickListener() {
+                    @Override
+                    public void onTagClick(int position, String text) {
+                        Help.w(text);
+                        listener.onTagClick(position, text);
+                        customDialog.dismiss();
+                    }
+
+                    @Override
+                    public void onTagLongClick(int position, String text) {
+                        Help.w(text);
+                        listener.onTagLongClick(position, text);
+                        customDialog.dismiss();
+                    }
                 });
+
+                mTagContainerLayout.setTags(chipsToUse);
 
                 Button search = v.findViewById(R.id.yes_button);
 
@@ -457,16 +492,18 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
 
                     //List<Site> siteList = SiteHelper.getSites();
                     try {
-                        Log.e("Line_" + new Throwable().getStackTrace()[0].getLineNumber(), currentSite.getMangaList().toString());
+                        Log.e("Line_" + new Throwable().getStackTrace()[0].getLineNumber(), currentSite.getMangaList().size()+" manga titles");
                         mangaList = new ArrayList<>();
                         mangaList.addAll(currentSite.getMangaList());
 
-                        mAdapter = new Manga2Adapter(mangaList, MainActivity.this, currentSite);
+                        mAdapter = new Manga2Adapter(mangaList, MainActivity.this, currentSite, currentLayout);
 
                         Log.e("Line_" + new Throwable().getStackTrace()[0].getLineNumber(), currentSite.getChapterList(mangaList.get(0)).get(0).getLink());
                         Log.e("Line_" + new Throwable().getStackTrace()[0].getLineNumber(), mangaList.toString());
 
                         chosen = false;
+
+                        StoryWorld.setSite(currentSite);
 
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -482,7 +519,7 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
                 if (success) {
                     if (!tag.equals(GenreTags.Sources.MANGAEDEN)) {
                         Log.e("Line_" + new Throwable().getStackTrace()[0].getLineNumber(), tag.source);
-                        mAdapter = new Manga2Adapter(mangaList, MainActivity.this);
+                        mAdapter = new Manga2Adapter(mangaList, MainActivity.this, currentSite, currentLayout);
                         mRecyclerView.setAdapter(mAdapter);
                     }
                 }
@@ -531,15 +568,17 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
 
                 String currentSource = currentSite == null ? "MangaEden" : currentSite.getName();
 
-                showChipDialog(android.R.drawable.ic_menu_search, "Current Source is " + currentSource, "Pick a new Source", GenreTags.getAllSources(), null, true, new TagGroup.OnTagClickListener() {
+                showChipDialog(android.R.drawable.ic_menu_search, "Current Source is " + currentSource, "Pick a new Source", GenreTags.getAllSources(), null, true, new TagView.OnTagClickListener() {
                     @Override
-                    public void onTagClick(final String tag) {
+                    public void onTagClick(int position, String text) {
 
-                        Log.e("Line_" + new Throwable().getStackTrace()[0].getLineNumber(), tag);
+                        Help.w(text);
 
-                        final String tags = tag;
+                        Log.e("Line_" + new Throwable().getStackTrace()[0].getLineNumber(), text);
 
-                        iosDialog(tag, new View.OnClickListener() {
+                        final String tags = text;
+
+                        iosDialog(text, new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
                                 newSource(GenreTags.Sources.fromString(tags));
@@ -553,19 +592,22 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
                         //newSource(GenreTags.Sources.fromString(tag));
                     }
 
+                    @Override
+                    public void onTagLongClick(int position, String text) {
+                        Help.w(text);
+                    }
                 });
 
                 return false;
             }
         });
 
-
         PrimaryDrawerItem genreChange = new PrimaryDrawerItem().withIdentifier(2).withSelectable(false).withName("Genre Search").withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
             @Override
             public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
                 //SharedPreferencesManager.getInstance().clear();
 
-                showChipDialog(android.R.drawable.ic_menu_search, "Choose a Genre", "Pick as Many as you Want", GenreTags.getAllTags(), new View.OnClickListener() {
+                /*showChipDialog(android.R.drawable.ic_menu_search, "Choose a Genre", "Pick as Many as you Want", GenreTags.getAllTags(), new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
 
@@ -604,13 +646,13 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
 
                                         }
 
-                                        /*for(String s : mangaDetails.getCategories()) {
+                                        *//*for(String s : mangaDetails.getCategories()) {
                                             Help.w(mangaDetails.getTitle(), s);
                                             if(tag.equals(s)) {
                                                 alm.add(mangaArrayList.get(i));
                                                 break;
                                             }
-                                        }*/
+                                        }*//*
 
                                     }
 
@@ -630,7 +672,9 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
                         }).execute();
 
                     }
-                });
+                });*/
+
+                genreSearch();
 
                 return false;
             }
@@ -673,7 +717,7 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
 
                     Collections.sort(mangaList, mangaSort());
 
-                    mAdapter = new Manga2Adapter(mangaList, MainActivity.this, currentSite);
+                    mAdapter = new Manga2Adapter(mangaList, MainActivity.this, currentSite, currentLayout);
                     mRecyclerView.setAdapter(mAdapter);
 
                 }
@@ -719,13 +763,15 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
 
                             }
                         }, true,
-                        new TagGroup.OnTagClickListener() {
+                        new TagView.OnTagClickListener() {
                             @Override
-                            public void onTagClick(String tag) {
+                            public void onTagClick(int position, String text) {
 
-                                currentLayout = Layouts.fromString(tag);
+                                Help.w(text);
 
-                                switch (Layouts.fromString(tag)) {
+                                currentLayout = Layouts.fromString(text);
+
+                                switch (Layouts.fromString(text)) {
 
                                     case STAGGERED_THUMBNAILS:
                                         mLayoutManager = new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL);
@@ -750,7 +796,11 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
 
                                 mAdapter = new MangaAdapter(mangaArrayList, MainActivity.this, client, currentLayout);
                                 mRecyclerView.setAdapter(mAdapter);
+                            }
 
+                            @Override
+                            public void onTagLongClick(int position, String text) {
+                                Help.w(text);
                             }
                         });
 
@@ -801,6 +851,151 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
                 })
                 .build();
 
+    }
+
+    TagContainerLayout mTagContainerLayout;
+
+    public void genreSearch() {
+        final LovelyCustomDialog customDialog = new LovelyCustomDialog(MainActivity.this)
+                .setView(R.layout.genre_choose_layout)
+                .setTopColorRes(R.color.md_blue_A400)
+                .setTitle("Pick some Genre's")
+                .setMessage("Pick")
+                .setTitleGravity(Gravity.CENTER_HORIZONTAL)
+                .setMessageGravity(Gravity.CENTER_HORIZONTAL)
+                .setIcon(android.R.drawable.ic_menu_search);
+
+        final ArrayList<String> tagsChosen = new ArrayList<>();
+
+        customDialog.configureView(new LovelyCustomDialog.ViewConfigurator() {
+            @Override
+            public void configureView(View v) {
+
+                /*final TagGroup tagGroup = v.findViewById(R.id.tag_group);
+
+                tagGroup.setTags(GenreTags.getAllTags());
+
+                tagGroup.setOnTagClickListener(new TagGroup.OnTagClickListener() {
+                    @Override
+                    public void onTagClick(String tag) {
+
+                        if(tagsChosen.contains(tag)) {
+                            tagsChosen.remove(tag);
+                        } else {
+                            tagsChosen.add(tag);
+                        }
+
+                    }
+                });*/
+
+                mTagContainerLayout = (TagContainerLayout) v.findViewById(R.id.tag_group);
+
+                mTagContainerLayout.setMode(LayouMode.MULTIPLE_CHOICE);
+
+                mTagContainerLayout.setOnTagClickListener(new TagView.OnTagClickListener() {
+                    @Override
+                    public void onTagClick(int position, String text) {
+                        Help.w(text);
+                        if(tagsChosen.contains(text)) {
+                            tagsChosen.remove(text);
+                        } else {
+                            tagsChosen.add(text);
+                        }
+
+                        //Help.d(Arrays.toString(tagsChosen.toArray()));
+
+                    }
+
+                    @Override
+                    public void onTagLongClick(int position, String text) {
+                        Help.w(text);
+                    }
+                });
+
+                mTagContainerLayout.setTags(GenreTags.getAllTags());
+
+            }
+        });
+
+        customDialog.setListener(R.id.yes_button, true, new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                //Help.d(Arrays.toString(mTagContainerLayout.getSelectedItems().toArray()));
+
+                mRecyclerView.setHasTransientState(true);
+
+                new RetrieveInfo(new AsyncTasks() {
+                    @Override
+                    public void onPreExecute() {
+
+                        alm.clear();
+                        //Help.w("TAG", mTagContainerLayout.getSelectedItems().toString());
+                        mAdapter = new MangaAdapter(alm, MainActivity.this, client, currentLayout);
+                        mRecyclerView.setAdapter(mAdapter);
+
+                    }
+
+                    @Override
+                    public boolean doInBackground() {
+
+                        try {
+
+                            for (int i = 0; i < mangaArrayList.size(); i++) {
+
+                                MangaDetails mangaDetails = client.getMangaDetails(mangaArrayList.get(i).getId());
+                                //Help.w(mangaDetails.getTitle(), Arrays.toString(mangaDetails.getCategories()));
+                                boolean add = true;
+                                for(String s : mTagContainerLayout.getSelectedItems()) {
+
+                                    if(!Arrays.toString(mangaDetails.getCategories()).contains(s)) {
+
+                                        /*Handler uiHandler = new Handler(Looper.getMainLooper());
+                                        uiHandler.post(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                searchBars.setPlaceHolder("Search here through " + alm.size() + " items");
+                                            }
+                                        });*/
+
+                                        add = false;
+                                    }
+                                }
+
+                                if(add) {
+                                    Help.w(mangaDetails.getTitle(), Arrays.toString(mangaDetails.getCategories()));
+                                    alm.add(mangaArrayList.get(i));
+                                    Handler handler = MainActivity.this.getWindow().getDecorView().getHandler();
+                                    handler.post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            ((MangaAdapter) mAdapter).notifyData(alm);
+                                        }
+                                    });
+
+                                }
+
+                            }
+
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+
+                        return false;
+                    }
+
+                    @Override
+                    public void onPostExecute(Boolean success) {
+                        //mAdapter = new MangaAdapter(alm, MainActivity.this, client, currentLayout);
+                        //mRecyclerView.setAdapter(mAdapter);
+                        mRecyclerView.setHasTransientState(false);
+                    }
+                }).execute();
+            }
+        });
+
+        customDialog.show();
     }
 
     public void sortManga(int id) {
