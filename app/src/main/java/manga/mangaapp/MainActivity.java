@@ -144,9 +144,11 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
     ArrayList<Manga> tagSearch;
     ArrayList<MangaDetails> mangaDetailsArrayList;
 
+    ArrayList<manga.mangaapp.manymanga.data.Manga> mangaSearchList;
     ArrayList<manga.mangaapp.manymanga.data.Manga> mangaList;
     Site currentSite;
     Layouts currentLayout;
+    GenreTags.Sources currentSource;
 
     ProfileDrawerItem profileDrawerItem;
     AccountHeader headerResult;
@@ -160,6 +162,7 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
         Help.e("Hello", "World");
 
         currentLayout = Layouts.DETAILS;
+        currentSource = GenreTags.Sources.MANGAEDEN;
 
         String picture = SharedPreferencesManager.getInstance().getValue("profile_image", String.class);
 
@@ -178,6 +181,8 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
         tagSearch = new ArrayList<>();
         mangaDetailsArrayList = new ArrayList<>();
 
+        mangaSearchList = new ArrayList<>();
+
         mRecyclerView = findViewById(R.id.manga_list);
 
         fab = findViewById(R.id.switch_source);
@@ -195,39 +200,80 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
 
             @Override
             public void onTextChanged(CharSequence s, int i3, int i1, int i2) {
-                //All this is to search
-                mangaSearch.clear();
-                searchKey = s.toString();
-                System.out.println(searchKey);
-                //We search both number and name
-                for (int i = 0; i < mangaArrayList.size(); i++) {
-                    if (mangaArrayList.get(i).getTitle().toUpperCase().contains(searchKey.toUpperCase())) {
-                        mangaSearch.add(mangaArrayList.get(i));
+
+                Help.v(currentSource.source);
+
+                if(currentSource.equals(GenreTags.Sources.MANGAEDEN)) {
+
+                    //All this is to search
+                    mangaSearch.clear();
+                    searchKey = s.toString();
+                    System.out.println(searchKey);
+                    //We search both number and name
+                    for (int i = 0; i < mangaArrayList.size(); i++) {
+                        if (mangaArrayList.get(i).getTitle().toUpperCase().contains(searchKey.toUpperCase())) {
+                            mangaSearch.add(mangaArrayList.get(i));
+                        }
+
                     }
 
-                }
+                    //set the adapter for real time searching
+                    mAdapter = new MangaAdapter(mangaSearch, MainActivity.this, client, currentLayout);
+                    mRecyclerView.setAdapter(mAdapter);
 
-                //set the adapter for real time searching
-                mAdapter = new MangaAdapter(mangaSearch, MainActivity.this, client, currentLayout);
-                mRecyclerView.setAdapter(mAdapter);
-
-                //this is for the suggestion list
-                List<String> suggestions = new ArrayList<>();
-                //As long as the search size isn't 0
-                if (mangaSearch.size() != 0) {
-                    //Go through and show only 5 suggestions if applicable
-                    for (int i = 0; i < 5 && i < mangaSearch.size(); i++) {
-                        suggestions.add(mangaSearch.get(i).getTitle());
-                    }
-                    //From here, update suggest list
-                    searchBars.updateLastSuggestions(suggestions);
-                    //if the search text is "" then just hide the list
-                    if (s.length() == 0) {
+                    //this is for the suggestion list
+                    List<String> suggestions = new ArrayList<>();
+                    //As long as the search size isn't 0
+                    if (mangaSearch.size() != 0) {
+                        //Go through and show only 5 suggestions if applicable
+                        for (int i = 0; i < 5 && i < mangaSearch.size(); i++) {
+                            suggestions.add(mangaSearch.get(i).getTitle());
+                        }
+                        //From here, update suggest list
+                        searchBars.updateLastSuggestions(suggestions);
+                        //if the search text is "" then just hide the list
+                        if (s.length() == 0) {
+                            searchBars.hideSuggestionsList();
+                        }
+                        //otherwise just hide the list
+                    } else {
                         searchBars.hideSuggestionsList();
                     }
-                    //otherwise just hide the list
+
                 } else {
-                    searchBars.hideSuggestionsList();
+                    //All this is to search
+                    mangaSearchList.clear();
+                    searchKey = s.toString();
+                    System.out.println(searchKey);
+                    //We search both number and name
+                    for (int i = 0; i < mangaList.size(); i++) {
+                        if (mangaList.get(i).getTitle().toUpperCase().contains(searchKey.toUpperCase())) {
+                            mangaSearchList.add(mangaList.get(i));
+                        }
+                    }
+
+                    //set the adapter for real time searching
+                    mAdapter = new Manga2Adapter(mangaSearchList, MainActivity.this, currentSite, currentLayout);
+                    mRecyclerView.setAdapter(mAdapter);
+
+                    //this is for the suggestion list
+                    List<String> suggestions = new ArrayList<>();
+                    //As long as the search size isn't 0
+                    if (mangaSearchList.size() != 0) {
+                        //Go through and show only 5 suggestions if applicable
+                        for (int i = 0; i < 5 && i < mangaSearchList.size(); i++) {
+                            suggestions.add(mangaSearchList.get(i).getTitle());
+                        }
+                        //From here, update suggest list
+                        searchBars.updateLastSuggestions(suggestions);
+                        //if the search text is "" then just hide the list
+                        if (s.length() == 0) {
+                            searchBars.hideSuggestionsList();
+                        }
+                        //otherwise just hide the list
+                    } else {
+                        searchBars.hideSuggestionsList();
+                    }
                 }
 
             }
@@ -260,8 +306,7 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
         mLayoutManager = new LinearLayoutManager(this);
         mLayoutManager.setItemPrefetchEnabled(true);
         mRecyclerView.setLayoutManager(mLayoutManager);
-        //new RetrieveManga(this).execute();
-        //new RetrieveComics(this).execute();
+
         getMangaEden();
 
         fab.setOnClickListener(new View.OnClickListener() {
@@ -302,7 +347,7 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
         new RetrieveInfo(new AsyncTasks() {
             @Override
             public void onPostExecute(Boolean success) {
-                Collections.sort(mangaArrayList, mangaSort(R.id.sort_date));
+                //Collections.sort(mangaArrayList, mangaSort(R.id.sort_date));
 
                 //set the adapter for real time searching
                 mAdapter = new MangaAdapter(mangaArrayList, MainActivity.this, client, currentLayout);
@@ -324,7 +369,7 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
 
                     mangaArrayList.addAll(mangaList);
 
-                    Collections.sort(mangaArrayList, mangaSort(R.id.sort_title));
+                    //Collections.sort(mangaArrayList, mangaSort(R.id.sort_title));
 
                     /*for(int i=0;i<mangaArrayList.size();i++) {
                         Log.w("Line_"+new Throwable().getStackTrace()[0].getLineNumber(), mangaArrayList.get(i).getTitle());
@@ -449,6 +494,8 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
             public boolean doInBackground() {
 
                 currentSite = new MangaFox();
+
+                currentSource = tag;
 
                 switch (tag) {
                     case MANGAEDEN:
@@ -715,7 +762,12 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
 
                 } else if (mAdapter != null) {
 
-                    Collections.sort(mangaList, mangaSort());
+                    Collections.sort(mangaList, new Comparator<manga.mangaapp.manymanga.data.Manga>() {
+                        @Override
+                        public int compare(manga.mangaapp.manymanga.data.Manga manga, manga.mangaapp.manymanga.data.Manga t1) {
+                            return manga.getTitle().compareTo(t1.getTitle());
+                        }
+                    });
 
                     mAdapter = new Manga2Adapter(mangaList, MainActivity.this, currentSite, currentLayout);
                     mRecyclerView.setAdapter(mAdapter);
@@ -1050,17 +1102,6 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
         }
 
         return sorted;
-    }
-
-    public Comparator<manga.mangaapp.manymanga.data.Manga> mangaSort() {
-        Comparator<manga.mangaapp.manymanga.data.Manga> title = new Comparator<manga.mangaapp.manymanga.data.Manga>() {
-            @Override
-            public int compare(manga.mangaapp.manymanga.data.Manga manga, manga.mangaapp.manymanga.data.Manga t1) {
-                return manga.getTitle().compareTo(t1.getTitle());
-            }
-        };
-
-        return title;
     }
 
     public void iosDialog(String source, final View.OnClickListener positive, final View.OnClickListener negative) {

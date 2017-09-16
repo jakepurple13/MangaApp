@@ -6,10 +6,13 @@ buildscript {
         google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.0.0-beta5'
+        classpath 'com.android.tools.build:gradle:3.0.0-beta6'
         //classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
+    }
+    ext {
+        animated_toolbar_version = '0.1.0'
     }
 }
 
@@ -26,6 +29,9 @@ allprojects {
         }
         maven {
             url 'http://dl.bintray.com/raphaelbussa/maven'
+        }
+        maven {
+            url 'http://dl.bintray.com/s64/maven'
         }
     }
 }

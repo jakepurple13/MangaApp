@@ -135,8 +135,10 @@ public class Manga2Adapter extends RecyclerView.Adapter<Manga2Adapter.ViewHolder
 
                     String cover = null;
                     Help.i(Arrays.toString(mDataset.toArray()));
+                    int chapterCount = 0;
                     try {
                         cover = sites.coverURL(mDataset.get(position));
+                        chapterCount = sites.getChapterList(mDataset.get(position)).size();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -144,7 +146,7 @@ public class Manga2Adapter extends RecyclerView.Adapter<Manga2Adapter.ViewHolder
                     String des = null;
 
                     try {
-                        des = sites.getMangaSummary(mDataset.get(position));
+                        des = "\nChapter Count: " + chapterCount + "\n" + sites.getMangaSummary(mDataset.get(position));
                     } catch (Exception e) {
                         e.printStackTrace();
                         des = "N/A";

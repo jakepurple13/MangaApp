@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import com.karumi.marvelapiclient.model.ComicDto;
 import com.karumi.marvelapiclient.model.MarvelImage;
+import com.kingfisher.easy_sharedpreference_library.SharedPreferencesManager;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -34,6 +35,8 @@ public class ChapterListAdapter extends RecyclerView.Adapter<ChapterListAdapter.
     private Chapter[] mDataset;
     //Contact activity
     Activity in;
+    String mangaID;
+    int currentChapter;
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -59,9 +62,11 @@ public class ChapterListAdapter extends RecyclerView.Adapter<ChapterListAdapter.
         mDataset = myDataset;
         this.in = in;
     }*/
-    public ChapterListAdapter(Chapter[] myDataset, Activity in) {
+    public ChapterListAdapter(Chapter[] myDataset, Activity in, String mangaID, int currentChapter) {
         mDataset = myDataset;
         this.in = in;
+        this.mangaID = mangaID;
+        this.currentChapter = currentChapter;
     }
 
     // Create new views (invoked by the layout manager)
@@ -85,14 +90,22 @@ public class ChapterListAdapter extends RecyclerView.Adapter<ChapterListAdapter.
         ib.setVisibility(View.GONE);
         String title = mDataset[position].getTitle()!=null ? mDataset[position].getTitle() : "";
         String text = mDataset[position].getNumber() + ". " + title;
+        if(currentChapter==(mDataset.length-position)) {
+            text+="\t<--";
+        }
         tv.setText(text);
         tv.setTextSize(15f);
 
         View.OnClickListener onClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                SharedPreferencesManager.getInstance().putValue(mangaID, mDataset[position].getNumber());
+
                 Intent intent = new Intent(in, ReadManga.class);
                 intent.putExtra("chapter_id", mDataset[position].getId());
+                intent.putExtra("chapter_number", mDataset[position].getNumber());
+                intent.putExtra("manga_id", mangaID);
                 in.startActivity(intent);
             }
         };

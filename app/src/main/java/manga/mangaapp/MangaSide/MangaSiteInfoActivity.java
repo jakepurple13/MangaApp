@@ -4,6 +4,8 @@ package manga.mangaapp.MangaSide;
  * Created by Jacob on 9/14/17.
  */
 
+import android.icu.math.BigDecimal;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -71,6 +73,7 @@ public class MangaSiteInfoActivity extends AppCompatActivity {
 
     TextView title;
     TextView description;
+    TextView link;
 
     SiteChapterListAdapter chapterListAdapter;
 
@@ -90,6 +93,7 @@ public class MangaSiteInfoActivity extends AppCompatActivity {
 
         title = findViewById(R.id.manga_title);
         description = findViewById(R.id.manga_description);
+        link = findViewById(R.id.manga_link);
 
         mRecyclerView = findViewById(R.id.chapter_list);
 
@@ -132,6 +136,7 @@ public class MangaSiteInfoActivity extends AppCompatActivity {
 
                 try {
                     String url = s.coverURL(m);
+                    link.setText(s.getUrl()+mangaLink);
                     Help.w(url);
                     Handler uiHandler = new Handler(Looper.getMainLooper());
                     final String finalUrl1 = url;
@@ -186,9 +191,18 @@ public class MangaSiteInfoActivity extends AppCompatActivity {
                 Collections.sort(chapterList, new Comparator<Chapter>() {
                     @Override
                     public int compare(Chapter t, Chapter t1) {
-                        //return Long.valueOf(t.getDate()).compareTo(t1.getDate());
-                        //return Long.valueOf(t.getDate()).compareTo(t1.getDate());
-                        return t.getTitle().compareTo(t1.getTitle());
+
+                        try {
+
+                            int num1 = Integer.parseInt(t.getTitle().substring(0, t.getTitle().indexOf(":")).trim());
+                            int num2 = Integer.parseInt(t1.getTitle().substring(0, t1.getTitle().indexOf(":")).trim());
+
+                            return num2 - num1;
+
+                        } catch(StringIndexOutOfBoundsException e) {
+                            Help.w(e.getLocalizedMessage());
+                            return t.getTitle().compareTo(t1.getTitle());
+                        }
                     }
                 });
 

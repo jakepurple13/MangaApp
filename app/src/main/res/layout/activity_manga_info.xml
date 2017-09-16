@@ -50,7 +50,20 @@
     <android.support.v7.widget.RecyclerView
         android:id="@+id/chapter_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
+        android:layout_above="@id/manga_link"
         android:layout_below="@+id/relativeLayout" />
+
+    <TextView
+        android:id="@+id/manga_link"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:linksClickable="true"
+        android:autoLink="all"
+        android:textIsSelectable="true"
+        android:paddingBottom="5dp"
+        android:layout_alignParentBottom="true"
+        android:text="Link" />
 </RelativeLayout>

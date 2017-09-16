@@ -8,6 +8,19 @@
     android:layout_height="match_parent"
     tools:context="manga.mangaapp.MangaSide.ReadManga">
 
+    <jp.s64.android.animatedtoolbar.AnimatedToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:background="?attr/colorPrimary"
+        android:minHeight="?attr/actionBarSize"
+        android:elevation="4dp"
+        app:titleMarginStart="5dp"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+
     <android.support.v4.view.ViewPager
         android:id="@+id/viewpages"
         android:layout_width="match_parent"
@@ -24,7 +37,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/show_and_hide"
-            app:backgroundTint="@color/colorPrimary"
+            app:backgroundTint="@color/dark_grey"
             android:src="@drawable/chip" />
 
         <RelativeLayout
@@ -33,15 +46,15 @@
             android:layout_height="match_parent">
 
 
-
         </RelativeLayout>
 
         <RelativeLayout
             android:id="@+id/secondary_view"
+            android:gravity="center"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <Button
+            <!--<Button
                 android:id="@+id/back_page"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -49,13 +62,24 @@
                 android:layout_alignParentTop="true"
                 android:text="Left" />
 
+            <EditText
+                android:id="@+id/page_number"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_toStartOf="@+id/close_view"
+                android:layout_toEndOf="@id/back_page"
+                android:ems="10"
+                android:hint="1"
+                android:inputType="number" />
+
             <Button
                 android:id="@+id/close_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
-                android:layout_centerHorizontal="true"
-                android:text="Close" />
+                android:layout_toStartOf="@+id/forward_page"
+                android:text="Go" />
 
             <Button
                 android:id="@+id/forward_page"
@@ -63,8 +87,26 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
                 android:layout_alignParentEnd="true"
-                android:text="Right" />
+                android:text="Right" />-->
 
+            <org.adw.library.widgets.discreteseekbar.DiscreteSeekBar
+                android:id="@+id/page_chooser"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toStartOf="@+id/page_count"
+                app:dsb_max="15"
+                app:dsb_min="2" />
+
+            <TextView
+                android:id="@+id/page_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/page_chooser"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentTop="true"
+                android:paddingEnd="5dp"
+                android:textColor="@color/white"
+                android:text="TextView" />
 
         </RelativeLayout>
 

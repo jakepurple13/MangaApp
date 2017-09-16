@@ -140,17 +140,10 @@ public class MangaInfoActivity extends AppCompatActivity {
                     titleText+=s+"\t";
                 }
 
-                //Date date = new Date();
-                //date.setTime(mangaDetails.getCreated());
-
-                //titleText+="\nCreated:"+date;
-
                 title.setText(titleText);
                 description.setText(mangaDetails.getDescription());
             }
         }).execute();
-
-
 
     }
 

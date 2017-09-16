@@ -134,9 +134,9 @@ public class MangaAdapter extends RecyclerView.Adapter<MangaAdapter.ViewHolder>{
                     try {
 
                         // Get chapter details
-                    /*ChapterDetails chapterDetails = client.getChapterDetails(chapters[0].getId());
-                    ChapterPage[] pages = chapterDetails.getPages();
-                    chaptersList = pages;*/
+                        /*ChapterDetails chapterDetails = client.getChapterDetails(chapters[0].getId());
+                        ChapterPage[] pages = chapterDetails.getPages();
+                        chaptersList = pages;*/
                         // Get chapter page image URLs
                         //final URI imageUrl = pages[0].getImageURI();
                         final URI imageUrl = MangaEden.manga2ImageURI(mangaDetails.getImage());
@@ -146,8 +146,8 @@ public class MangaAdapter extends RecyclerView.Adapter<MangaAdapter.ViewHolder>{
                             @Override
                             public void run() {
 
-                                int width = 600;
-                                int height = 800;
+                                int width = (int) in.getResources().getDimension(R.dimen.default_image_width);
+                                int height = (int) in.getResources().getDimension(R.dimen.default_image_height);
 
                                 if(layoutType.equals(Layouts.DETAILS)) {
                                     TextView details = holder.summary;

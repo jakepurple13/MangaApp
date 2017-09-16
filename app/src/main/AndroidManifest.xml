@@ -22,8 +22,8 @@
         </activity>
         <activity android:name=".MangaSide.MangaInfoActivity" />
         <activity android:name=".MangaSide.MangaSiteInfoActivity" />
-        <activity android:name=".MangaSide.ReadManga" />
-        <activity android:name=".MangaSide.ReadMangaSite" />
+        <activity android:name=".MangaSide.ReadManga" android:theme="@style/Base.Theme.AppCompat.NoBar"/>
+        <activity android:name=".MangaSide.ReadMangaSite" android:theme="@style/Base.Theme.AppCompat.NoBar"/>
     </application>
 
 </manifest>

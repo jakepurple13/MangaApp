@@ -101,8 +101,8 @@ public class SiteChapterListAdapter extends RecyclerView.Adapter<SiteChapterList
         TextView tv = holder.mTextView;
         ImageView ib = holder.imageView;
         ib.setVisibility(View.GONE);
-        String title = mDataset.get(position).getTitle()!=null ? mDataset.get(position).getTitle() : "";
-        String text = mDataset.get(position).getTitle() + ". " + title;
+        //String title = mDataset.get(position).getTitle()!=null ? mDataset.get(position).getTitle() : "";
+        String text = mDataset.get(position).getTitle();// + ". " + title;
         tv.setText(text);
         tv.setTextSize(15f);
 

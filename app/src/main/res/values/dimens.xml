@@ -1,3 +1,10 @@
 <resources>
     <dimen name="fab_margin">16dp</dimen>
+
+    <dimen name="default_image_width">600px</dimen>
+    <dimen name="default_image_height">800px</dimen>
+
+    <dimen name="half_image_width">300px</dimen>
+    <dimen name="half_image_height">400px</dimen>
+
 </resources>

@@ -18,8 +18,8 @@
 
     <ImageView
         android:id="@+id/imageButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/half_image_width"
+        android:layout_height="@dimen/half_image_height"
         app:srcCompat="@mipmap/ic_launcher"
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"/>
