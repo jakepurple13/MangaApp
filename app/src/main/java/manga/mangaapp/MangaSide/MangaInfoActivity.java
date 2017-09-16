@@ -8,9 +8,11 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.kingfisher.easy_sharedpreference_library.SharedPreferencesManager;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
@@ -42,6 +44,7 @@ public class MangaInfoActivity extends AppCompatActivity {
 
     TextView title;
     TextView description;
+    TextView link;
 
     ChapterListAdapter chapterListAdapter;
 
@@ -61,6 +64,7 @@ public class MangaInfoActivity extends AppCompatActivity {
 
         title = findViewById(R.id.manga_title);
         description = findViewById(R.id.manga_description);
+        link = findViewById(R.id.manga_link);
 
         mRecyclerView = findViewById(R.id.chapter_list);
 
@@ -69,6 +73,8 @@ public class MangaInfoActivity extends AppCompatActivity {
         mRecyclerView.addItemDecoration(new DividerItemDecoration(this,DividerItemDecoration.VERTICAL ));
 
         final String mangaID = getIntent().getStringExtra("manga_id");
+
+        final int chapterNum = SharedPreferencesManager.getInstance().getValue(mangaID, Integer.class, 0);
 
         new RetrieveInfo(new AsyncTasks() {
             @Override
@@ -130,7 +136,7 @@ public class MangaInfoActivity extends AppCompatActivity {
                     }
                 });
 
-                chapterListAdapter = new ChapterListAdapter(chapters, MangaInfoActivity.this);
+                chapterListAdapter = new ChapterListAdapter(chapters, MangaInfoActivity.this, mangaID, chapterNum);
                 mRecyclerView.setAdapter(chapterListAdapter);
                 String titleText = mangaDetails.getTitle() + "\nTags: ";
 
@@ -142,6 +148,9 @@ public class MangaInfoActivity extends AppCompatActivity {
 
                 title.setText(titleText);
                 description.setText(mangaDetails.getDescription());
+                link.setText(mangaDetails.getURI().toString());
+                link.setLinksClickable(true);
+
             }
         }).execute();
 
