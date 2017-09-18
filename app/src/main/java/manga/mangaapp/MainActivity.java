@@ -162,7 +162,7 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
         Help.e("Hello", "World");
 
         currentLayout = Layouts.DETAILS;
-        currentSource = GenreTags.Sources.MANGAEDEN;
+        currentSource = GenreTags.Sources.fromString(SharedPreferencesManager.getInstance().getValue("manga_source", String.class, "MangaEden"));
 
         String picture = SharedPreferencesManager.getInstance().getValue("profile_image", String.class);
 
@@ -307,7 +307,7 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
         mLayoutManager.setItemPrefetchEnabled(true);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        getMangaEden();
+        newSource(currentSource);
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -456,9 +456,9 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
 
                 Button search = v.findViewById(R.id.yes_button);
 
-                if (sourceOrGenre || true) {
+                //if (sourceOrGenre || true) {
                     search.setVisibility(View.GONE);
-                }
+                //}
 
                 search.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -569,6 +569,7 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
                         mAdapter = new Manga2Adapter(mangaList, MainActivity.this, currentSite, currentLayout);
                         mRecyclerView.setAdapter(mAdapter);
                     }
+                    SharedPreferencesManager.getInstance().putValue("manga_source", currentSource.source);
                 }
             }
         }).execute();
