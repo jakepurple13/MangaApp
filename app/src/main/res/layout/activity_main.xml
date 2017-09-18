@@ -21,15 +21,30 @@
         android:id="@+id/manga_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/searchBar"
+        android:layout_above="@+id/site_link"
+        android:layout_below="@id/searchBar"
         android:layout_alignParentStart="true" />
-
 
     <android.support.design.widget.FloatingActionButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
+        android:visibility="gone"
         android:id="@+id/switch_source"/>
+
+    <TextView
+        android:id="@+id/site_link"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentStart="true"
+        android:linksClickable="true"
+        android:autoLink="all"
+        android:paddingBottom="5dp"
+        android:paddingTop="5dp"
+        android:gravity="center_horizontal"
+        android:text="Site Link" />
 
 </RelativeLayout>

@@ -19,6 +19,7 @@ import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
@@ -31,10 +32,13 @@ import android.text.style.ForegroundColorSpan;
 import android.text.style.SuperscriptSpan;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.OvershootInterpolator;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.adroitandroid.chipcloud.ChipCloud;
@@ -43,6 +47,11 @@ import com.cleveroad.fanlayoutmanager.FanLayoutManager;
 import com.cleveroad.fanlayoutmanager.FanLayoutManagerSettings;
 import com.forcelain.awesomelayoutmanager.AwesomeLayoutManager;
 import com.gdacciaro.iOSDialog.iOSDialog;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.greenfrvr.hashtagview.HashtagView;
 import com.karumi.marvelapiclient.ComicApiClient;
 import com.karumi.marvelapiclient.MarvelApiConfig;
@@ -70,6 +79,7 @@ import com.mikepenz.materialdrawer.model.ToggleDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.yarolegovich.lovelydialog.LovelyCustomDialog;
+import com.yarolegovich.lovelydialog.LovelyProgressDialog;
 
 import net.alhazmy13.gota.Gota;
 import net.alhazmy13.gota.GotaResponse;
@@ -154,12 +164,18 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
     AccountHeader headerResult;
     Drawer result;
 
+    TextView siteLink;
+
+    private FirebaseAuth mAuth;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         Help.e("Hello", "World");
+
+        mAuth = FirebaseAuth.getInstance();
 
         currentLayout = Layouts.DETAILS;
         currentSource = GenreTags.Sources.fromString(SharedPreferencesManager.getInstance().getValue("manga_source", String.class, "MangaEden"));
@@ -185,10 +201,14 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
 
         mRecyclerView = findViewById(R.id.manga_list);
 
+        siteLink = findViewById(R.id.site_link);
+
         fab = findViewById(R.id.switch_source);
 
         searchBars = findViewById(R.id.searchBar);
 
+        searchBars.setNavButtonEnabled(true);
+        searchBars.setSpeechMode(false);
         searchBars.setHint("Search Here");
         searchBars.setPlaceHolder("Search Here");
 
@@ -299,6 +319,18 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
             @Override
             public void onButtonClicked(int buttonCode) {
                 searchBars.hideSuggestionsList();
+                Help.v("Button code: " + buttonCode);
+                switch (buttonCode){
+                    case MaterialSearchBar.BUTTON_NAVIGATION:
+                        result.openDrawer();
+                        Help.v("Button Nav");
+                        break;
+                    case MaterialSearchBar.BUTTON_SPEECH:
+                        Help.v("Button Speech");
+                        break;
+                    default:
+                        Help.v("Default");
+                }
             }
         });
 
@@ -457,7 +489,7 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
                 Button search = v.findViewById(R.id.yes_button);
 
                 //if (sourceOrGenre || true) {
-                    search.setVisibility(View.GONE);
+                search.setVisibility(View.GONE);
                 //}
 
                 search.setOnClickListener(new View.OnClickListener() {
@@ -534,9 +566,18 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
                 }
 
                 if (tag.equals(GenreTags.Sources.MANGAEDEN)) {
+                    result.addItemAtPosition(new PrimaryDrawerItem().withIdentifier(2).withSelectable(false).withName("Genre Search").withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                        @Override
+                        public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+
+                            genreSearch();
+
+                            return false;
+                        }
+                    }), 1);
                     getMangaEden();
                 } else {
-
+                    result.removeItem(2);
                     //List<Site> siteList = SiteHelper.getSites();
                     try {
                         Log.e("Line_" + new Throwable().getStackTrace()[0].getLineNumber(), currentSite.getMangaList().size()+" manga titles");
@@ -569,10 +610,110 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
                         mAdapter = new Manga2Adapter(mangaList, MainActivity.this, currentSite, currentLayout);
                         mRecyclerView.setAdapter(mAdapter);
                     }
+                    siteLink.setText(currentSite.getUrl());
                     SharedPreferencesManager.getInstance().putValue("manga_source", currentSource.source);
                 }
             }
         }).execute();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        // Check if user is signed in (non-null) and update UI accordingly.
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+
+        if(currentUser!=null) {
+            updateUI(currentUser);
+        }
+
+        /*FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            // Name, email address, and profile photo Url
+            String name = user.getDisplayName();
+            String email = user.getEmail();
+            Uri photoUrl = user.getPhotoUrl();
+
+            // Check if user's email is verified
+            boolean emailVerified = user.isEmailVerified();
+
+            // The user's ID, unique to the Firebase project. Do NOT use this value to
+            // authenticate with your backend server, if you have one. Use
+            // FirebaseUser.getToken() instead.
+            String uid = user.getUid();
+        }*/
+
+    }
+
+    public void updateUI(FirebaseUser user) {
+        profileDrawerItem.withIcon(user.getPhotoUrl());
+        profileDrawerItem.withEmail(user.getEmail());
+        profileDrawerItem.withName(user.getDisplayName());
+        headerResult.updateProfile(profileDrawerItem);
+    }
+
+    public void signIn(String email, String password, final LovelyCustomDialog dialog) {
+
+        dialog.dismiss();
+        final LovelyProgressDialog lovelyProgressDialog = new LovelyProgressDialog(MainActivity.this);
+        lovelyProgressDialog.setMessage("Please Wait");
+        lovelyProgressDialog.show();
+
+        mAuth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // Sign in success, update UI with the signed-in user's information
+                            Help.d("signInWithEmail:success");
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            updateUI(user);
+
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            Help.w("signInWithEmail:failure", task.getException().toString());
+                            Toast.makeText(MainActivity.this, "Authentication failed.",
+                                    Toast.LENGTH_SHORT).show();
+                            updateUI(null);
+                        }
+
+                        lovelyProgressDialog.dismiss();
+
+                        // ...
+                    }
+                });
+    }
+
+    public void signUp(String email, String password, final LovelyCustomDialog dialog) {
+        dialog.dismiss();
+        final LovelyProgressDialog lovelyProgressDialog = new LovelyProgressDialog(MainActivity.this);
+        lovelyProgressDialog.setMessage("Please Wait");
+        lovelyProgressDialog.show();
+
+        mAuth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // Sign in success, update UI with the signed-in user's information
+                            Help.d("createUserWithEmail:success");
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            updateUI(user);
+                            user.sendEmailVerification();
+
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            Help.w("createUserWithEmail:failure", task.getException().toString());
+                            Toast.makeText(MainActivity.this, "Authentication failed.",
+                                    Toast.LENGTH_SHORT).show();
+                            updateUI(null);
+                        }
+
+                        lovelyProgressDialog.dismiss();
+
+                        // ...
+                    }
+                });
     }
 
     ArrayList<Manga> alm = new ArrayList<>();
@@ -587,12 +728,116 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
                 .withOnAccountHeaderProfileImageListener(new AccountHeader.OnAccountHeaderProfileImageListener() {
                     @Override
                     public boolean onProfileImageClick(View view, IProfile profile, boolean current) {
-                        EasyImage.openChooserWithGallery(MainActivity.this, "Choose a new Profile Picture", 1);
+
+                        if(mAuth.getCurrentUser()==null) {
+
+                            final LovelyCustomDialog customDialog = new LovelyCustomDialog(MainActivity.this)
+                                    .setView(R.layout.account_choice)
+                                    .setTopColorRes(R.color.md_blue_A400)
+                                    .setTitle("Account")
+                                    .setMessage("Sign in or Sign Up")
+                                    .setTitleGravity(Gravity.CENTER_HORIZONTAL)
+                                    .setMessageGravity(Gravity.CENTER_HORIZONTAL)
+                                    .setIcon(R.drawable.ic_menu_black_24dp);
+
+                            customDialog.configureView(new LovelyCustomDialog.ViewConfigurator() {
+                                @Override
+                                public void configureView(View v) {
+
+                                    Button signInButton = v.findViewById(R.id.signin);
+
+                                    Button signUpButton = v.findViewById(R.id.signup);
+
+                                    signInButton.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View view) {
+
+                                            final LovelyCustomDialog signInDialog = new LovelyCustomDialog(MainActivity.this)
+                                                    .setView(R.layout.sign_in_or_up)
+                                                    .setTopColorRes(R.color.md_blue_A400)
+                                                    .setTitle("Sign In")
+                                                    .setMessage("Sign in")
+                                                    .setTitleGravity(Gravity.CENTER_HORIZONTAL)
+                                                    .setMessageGravity(Gravity.CENTER_HORIZONTAL)
+                                                    .setIcon(R.drawable.ic_menu_black_24dp);
+
+                                            signInDialog.configureView(new LovelyCustomDialog.ViewConfigurator() {
+                                                @Override
+                                                public void configureView(View v) {
+
+                                                    final EditText email = v.findViewById(R.id.email);
+                                                    final EditText password = v.findViewById(R.id.password);
+                                                    Button submit = v.findViewById(R.id.submit);
+
+                                                    submit.setText("Sign In");
+
+                                                    submit.setOnClickListener(new View.OnClickListener() {
+                                                        @Override
+                                                        public void onClick(View view) {
+                                                            signIn(email.getText().toString(), password.getText().toString(), signInDialog);
+                                                        }
+                                                    });
+
+                                                }
+                                            });
+
+                                            signInDialog.show();
+
+                                        }
+                                    });
+
+                                    signUpButton.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View view) {
+
+                                            final LovelyCustomDialog signUpDialog = new LovelyCustomDialog(MainActivity.this)
+                                                    .setView(R.layout.sign_in_or_up)
+                                                    .setTopColorRes(R.color.md_blue_A400)
+                                                    .setTitle("Sign Up")
+                                                    .setMessage("Sign Up")
+                                                    .setTitleGravity(Gravity.CENTER_HORIZONTAL)
+                                                    .setMessageGravity(Gravity.CENTER_HORIZONTAL)
+                                                    .setIcon(R.drawable.ic_menu_black_24dp);
+
+                                            signUpDialog.configureView(new LovelyCustomDialog.ViewConfigurator() {
+                                                @Override
+                                                public void configureView(View v) {
+
+                                                    final EditText email = v.findViewById(R.id.email);
+                                                    final EditText password = v.findViewById(R.id.password);
+                                                    Button submit = v.findViewById(R.id.submit);
+
+                                                    submit.setText("Sign Up");
+
+                                                    submit.setOnClickListener(new View.OnClickListener() {
+                                                        @Override
+                                                        public void onClick(View view) {
+                                                            signUp(email.getText().toString(), password.getText().toString(), signUpDialog);
+                                                        }
+                                                    });
+
+                                                    signUpDialog.show();
+
+                                                }
+                                            });
+                                        }
+                                    });
+
+                                }
+                            });
+
+                            customDialog.show();
+
+                        } else {
+                            EasyImage.openChooserWithGallery(MainActivity.this, "Choose a new Profile Picture", 1);
+                        }
+
                         return false;
                     }
 
                     @Override
                     public boolean onProfileImageLongClick(View view, IProfile profile, boolean current) {
+                        EasyImage.openChooserWithGallery(MainActivity.this, "Choose a new Profile Picture", 1);
                         return false;
                     }
                 })
@@ -653,76 +898,18 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
         PrimaryDrawerItem genreChange = new PrimaryDrawerItem().withIdentifier(2).withSelectable(false).withName("Genre Search").withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
             @Override
             public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-                //SharedPreferencesManager.getInstance().clear();
-
-                /*showChipDialog(android.R.drawable.ic_menu_search, "Choose a Genre", "Pick as Many as you Want", GenreTags.getAllTags(), new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-
-                    }
-                }, false, new TagGroup.OnTagClickListener() {
-                    @Override
-                    public void onTagClick(final String tag) {
-
-                        new RetrieveInfo(new AsyncTasks() {
-                            @Override
-                            public void onPreExecute() {
-                                alm.clear();
-                                Help.w("TAG", "asdf");
-                                mAdapter = new MangaAdapter(alm, MainActivity.this, client, currentLayout);
-                                mRecyclerView.setAdapter(mAdapter);
-                            }
-
-                            @Override
-                            public boolean doInBackground() {
-
-                                try {
-
-                                    for (int i = 0; i < mangaArrayList.size(); i++) {
-
-                                        MangaDetails mangaDetails = client.getMangaDetails(mangaArrayList.get(i).getId());
-                                        Help.w(mangaDetails.getTitle(), Arrays.toString(mangaDetails.getCategories()));
-                                        if (Arrays.toString(mangaDetails.getCategories()).contains(tag)) {
-                                            alm.add(mangaArrayList.get(i));
-                                            Handler uiHandler = new Handler(Looper.getMainLooper());
-                                            uiHandler.post(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    ((MangaAdapter) mAdapter).notifyData(alm);
-                                                }
-                                            });
-
-                                        }
-
-                                        *//*for(String s : mangaDetails.getCategories()) {
-                                            Help.w(mangaDetails.getTitle(), s);
-                                            if(tag.equals(s)) {
-                                                alm.add(mangaArrayList.get(i));
-                                                break;
-                                            }
-                                        }*//*
-
-                                    }
-
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-
-
-                                return false;
-                            }
-
-                            @Override
-                            public void onPostExecute(Boolean success) {
-                                //mAdapter = new MangaAdapter(alm, MainActivity.this, client, currentLayout);
-                                //mRecyclerView.setAdapter(mAdapter);
-                            }
-                        }).execute();
-
-                    }
-                });*/
 
                 genreSearch();
+
+                return false;
+            }
+        });
+
+        PrimaryDrawerItem logout = new PrimaryDrawerItem().withIdentifier(89).withSelectable(false).withName("Logout").withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+            @Override
+            public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+
+                mAuth.signOut();
 
                 return false;
             }
@@ -881,13 +1068,14 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
                 .withKeepStickyItemsVisible(true)
                 .addDrawerItems(
                         sourceChange,
-                        genreChange,
+                        //genreChange,
                         new DividerDrawerItem(),
                         //layoutChange,
                         layoutChangeChoice,
                         sortBy,
                         new DividerDrawerItem(),
-                        settings
+                        settings,
+                        logout
                         /*,
                         new ExpandableDrawerItem().withName("Collapsable").withIcon(GoogleMaterial.Icon.gmd_collections_bookmark).withIdentifier(19).withSelectable(false).withSubItems(
                                 new SecondaryDrawerItem().withName("CollapsableItem").withLevel(2).withIcon(GoogleMaterial.Icon.gmd_add_alert).withIdentifier(2002),

@@ -12,6 +12,14 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.kingfisher.easy_sharedpreference_library.SharedPreferencesManager;
 import com.squareup.picasso.Picasso;
 
@@ -24,6 +32,7 @@ import java.util.Date;
 import java.util.List;
 
 import manga.mangaapp.AsyncTasks;
+import manga.mangaapp.Help;
 import manga.mangaapp.R;
 import manga.mangaapp.RetrieveInfo;
 import manga.mangaapp.mangaedenclient.Chapter;
@@ -153,6 +162,44 @@ public class MangaInfoActivity extends AppCompatActivity {
 
             }
         }).execute();
+
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        if(user!=null) {
+
+            // Write a message to the database
+            FirebaseDatabase database = FirebaseDatabase.getInstance();
+            DatabaseReference myRef = database.getReference(user.getUid());
+
+            String newKey = myRef.push().getKey();//setValue(user.getUid());
+            myRef.child("manga_id").setValue(mangaID);
+
+            // Read from the database
+            myRef.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    // This method is called once with the initial value and again
+                    // whenever data at this location is updated.
+                    //String value = dataSnapshot.getValue(String.class);
+                    //Help.d("Value is: " + value);
+                }
+
+                @Override
+                public void onCancelled(DatabaseError error) {
+                    // Failed to read value
+                    //Help.w("Failed to read value.", error.toException().toString());
+                }
+            });
+
+            Query recentPostsQuery = myRef.child("manga_id")
+                    .limitToFirst(100);
+            Help.e(recentPostsQuery.toString());
+
+            Query q = myRef.child(user.getUid()).child("manga_id");
+
+
+        }
 
     }
 
