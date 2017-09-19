@@ -1,5 +1,6 @@
 package manga.mangaapp;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Handler;
@@ -35,7 +36,7 @@ public class MangaAdapter extends RecyclerView.Adapter<MangaAdapter.ViewHolder>{
     //The list of contacts
     private ArrayList<Manga> mDataset;
     //Contact activity
-    MainActivity in;
+    Activity in;
     MangaEdenClient client;
     int pageNumber = 0;
     int chapterNumber = 0;
@@ -63,7 +64,7 @@ public class MangaAdapter extends RecyclerView.Adapter<MangaAdapter.ViewHolder>{
 
     // Provide a suitable constructor (depends on the kind of dataset)
 
-    public MangaAdapter(ArrayList<Manga> myDataset, MainActivity in, MangaEdenClient client, Layouts layoutType) {
+    public MangaAdapter(ArrayList<Manga> myDataset, Activity in, MangaEdenClient client, Layouts layoutType) {
         mDataset = myDataset;
         this.in = in;
         this.client = client;

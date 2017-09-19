@@ -9,11 +9,13 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -29,12 +31,16 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import manga.mangaapp.AsyncTasks;
 import manga.mangaapp.Help;
 import manga.mangaapp.R;
 import manga.mangaapp.RetrieveInfo;
+import manga.mangaapp.UserInfo.FirebaseDatabaseUtil;
+import manga.mangaapp.UserInfo.UserInfo;
 import manga.mangaapp.mangaedenclient.Chapter;
 import manga.mangaapp.mangaedenclient.ChapterDetails;
 import manga.mangaapp.mangaedenclient.ChapterPage;
@@ -55,6 +61,8 @@ public class MangaInfoActivity extends AppCompatActivity {
     TextView description;
     TextView link;
 
+    Button fav;
+
     ChapterListAdapter chapterListAdapter;
 
     MangaEdenClient client;
@@ -70,6 +78,8 @@ public class MangaInfoActivity extends AppCompatActivity {
         setContentView(R.layout.activity_manga_info);
 
         imageView = findViewById(R.id.manga_cover);
+
+        fav = findViewById(R.id.favorite_manga);
 
         title = findViewById(R.id.manga_title);
         description = findViewById(R.id.manga_description);
@@ -104,23 +114,30 @@ public class MangaInfoActivity extends AppCompatActivity {
                     //ChapterDetails chapterDetails = client.getChapterDetails(chapters[0].getId());
                     //chapterPages = chapterDetails.getPages();
 
-                    Log.e("Line_"+new Throwable().getStackTrace()[0].getLineNumber(), mangaDetails.toString());
+                    Help.e(mangaDetails.toString());
 
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
 
-                final URI imageUrl = MangaEden.manga2ImageURI(mangaDetails.getImage());
-                Handler uiHandler = new Handler(Looper.getMainLooper());
-                uiHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        Picasso.with(MangaInfoActivity.this)
-                                .load(String.valueOf(imageUrl))
-                                .placeholder(android.R.mipmap.sym_def_app_icon)
-                                .into(imageView);
-                    }
-                });
+                try {
+
+                    final URI imageUrl = MangaEden.manga2ImageURI(mangaDetails.getImage());
+                    Handler uiHandler = new Handler(Looper.getMainLooper());
+                    uiHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Picasso.with(MangaInfoActivity.this)
+                                    .load(String.valueOf(imageUrl))
+                                    .resize(300, 400)
+                                    .placeholder(android.R.mipmap.sym_def_app_icon)
+                                    .into(imageView);
+                        }
+                    });
+
+                } catch(NullPointerException e) {
+                    e.printStackTrace();
+                }
 
                 chapterList = Arrays.asList(mangaDetails.getChapters());
 
@@ -160,46 +177,36 @@ public class MangaInfoActivity extends AppCompatActivity {
                 link.setText(mangaDetails.getURI().toString());
                 link.setLinksClickable(true);
 
+                setTitle(mangaDetails.getTitle());
+
+                fav.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+
+                        //if state to fav and unfav
+
+                        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+                        if (user != null) {
+
+                            // Write a message to the database
+                            //FirebaseDatabase database = FirebaseDatabase.getInstance();
+
+                            FirebaseDatabaseUtil.writeNewUser();
+
+                            FirebaseDatabaseUtil.writeNewPost(mangaID, chapterList.get((chapterList.size()-1) - chapterNum).getId(), mangaDetails.getTitle());
+
+                        }
+                    }
+                });
+
+
+
             }
         }).execute();
 
 
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
-        if(user!=null) {
-
-            // Write a message to the database
-            FirebaseDatabase database = FirebaseDatabase.getInstance();
-            DatabaseReference myRef = database.getReference(user.getUid());
-
-            String newKey = myRef.push().getKey();//setValue(user.getUid());
-            myRef.child("manga_id").setValue(mangaID);
-
-            // Read from the database
-            myRef.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    // This method is called once with the initial value and again
-                    // whenever data at this location is updated.
-                    //String value = dataSnapshot.getValue(String.class);
-                    //Help.d("Value is: " + value);
-                }
-
-                @Override
-                public void onCancelled(DatabaseError error) {
-                    // Failed to read value
-                    //Help.w("Failed to read value.", error.toException().toString());
-                }
-            });
-
-            Query recentPostsQuery = myRef.child("manga_id")
-                    .limitToFirst(100);
-            Help.e(recentPostsQuery.toString());
-
-            Query q = myRef.child(user.getUid()).child("manga_id");
-
-
-        }
 
     }
 

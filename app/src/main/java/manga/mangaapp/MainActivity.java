@@ -2,6 +2,9 @@ package manga.mangaapp;
 
 import android.Manifest;
 import android.animation.Animator;
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -38,6 +41,7 @@ import android.view.animation.OvershootInterpolator;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -78,6 +82,9 @@ import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ToggleDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
+import com.mikepenz.materialdrawer.util.AbstractDrawerImageLoader;
+import com.mikepenz.materialdrawer.util.DrawerImageLoader;
+import com.squareup.picasso.Picasso;
 import com.yarolegovich.lovelydialog.LovelyCustomDialog;
 import com.yarolegovich.lovelydialog.LovelyProgressDialog;
 
@@ -110,6 +117,7 @@ import jp.wasabeef.recyclerview.adapters.SlideInLeftAnimationAdapter;
 import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
 import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
 import manga.mangaapp.MangaSide.GenreTags;
+import manga.mangaapp.UserInfo.Favorites;
 import manga.mangaapp.mangaedenclient.Manga;
 import manga.mangaapp.mangaedenclient.MangaDetails;
 import manga.mangaapp.mangaedenclient.MangaEdenClient;
@@ -372,6 +380,31 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
         });
 
         fab.setVisibility(View.GONE);
+
+        //initialize and create the image loader logic
+        DrawerImageLoader.init(new AbstractDrawerImageLoader() {
+            @Override
+            public void set(ImageView imageView, Uri uri, Drawable placeholder) {
+                Picasso.with(imageView.getContext()).load(uri).placeholder(placeholder).into(imageView);
+            }
+
+            @Override
+            public void cancel(ImageView imageView) {
+                Picasso.with(imageView.getContext()).cancelRequest(imageView);
+            }
+
+            /*
+            @Override
+            public Drawable placeholder(Context ctx) {
+                return super.placeholder(ctx);
+            }
+
+            @Override
+            public Drawable placeholder(Context ctx, String tag) {
+                return super.placeholder(ctx, tag);
+            }
+            */
+        });
 
     }
 
@@ -652,9 +685,8 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
         headerResult.updateProfile(profileDrawerItem);
     }
 
-    public void signIn(String email, String password, final LovelyCustomDialog dialog) {
+    public void signIn(String email, String password) {
 
-        dialog.dismiss();
         final LovelyProgressDialog lovelyProgressDialog = new LovelyProgressDialog(MainActivity.this);
         lovelyProgressDialog.setMessage("Please Wait");
         lovelyProgressDialog.show();
@@ -684,8 +716,8 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
                 });
     }
 
-    public void signUp(String email, String password, final LovelyCustomDialog dialog) {
-        dialog.dismiss();
+    public void signUp(String email, String password) {
+
         final LovelyProgressDialog lovelyProgressDialog = new LovelyProgressDialog(MainActivity.this);
         lovelyProgressDialog.setMessage("Please Wait");
         lovelyProgressDialog.show();
@@ -774,7 +806,8 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
                                                     submit.setOnClickListener(new View.OnClickListener() {
                                                         @Override
                                                         public void onClick(View view) {
-                                                            signIn(email.getText().toString(), password.getText().toString(), signInDialog);
+                                                            signInDialog.dismiss();
+                                                            signIn(email.getText().toString(), password.getText().toString());
                                                         }
                                                     });
 
@@ -812,7 +845,8 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
                                                     submit.setOnClickListener(new View.OnClickListener() {
                                                         @Override
                                                         public void onClick(View view) {
-                                                            signUp(email.getText().toString(), password.getText().toString(), signUpDialog);
+                                                            signUpDialog.dismiss();
+                                                            signUp(email.getText().toString(), password.getText().toString());
                                                         }
                                                     });
 
@@ -900,6 +934,17 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
             public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
 
                 genreSearch();
+
+                return false;
+            }
+        });
+
+        PrimaryDrawerItem gotoFavorites = new PrimaryDrawerItem().withIdentifier(897).withSelectable(false).withName("Favorites").withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+            @Override
+            public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+
+                Intent i = new Intent(MainActivity.this, Favorites.class);
+                startActivity(i);
 
                 return false;
             }
@@ -1074,6 +1119,7 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
                         layoutChangeChoice,
                         sortBy,
                         new DividerDrawerItem(),
+                        gotoFavorites,
                         settings,
                         logout
                         /*,
@@ -1362,6 +1408,22 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
             }
             //new RetrieveManga(this).execute();
         }
+    }
+
+    public void addFragment(Fragment fragment) {
+        FragmentManager manager = getFragmentManager();
+        FragmentTransaction transaction = manager.beginTransaction();
+        transaction.add(R.id.container,fragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
+    }
+
+    public void replaceFragment(Fragment fragment) {
+        FragmentManager manager = getFragmentManager();
+        FragmentTransaction transaction = manager.beginTransaction();
+        transaction.replace(R.id.container,fragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
     }
 
     public void saveItems() {
