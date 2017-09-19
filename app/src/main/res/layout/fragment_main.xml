@@ -1,13 +1,50 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:clipChildren="true"
+    android:clipToPadding="true"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="manga.mangaapp.MainFragment">
+    tools:context="manga.mangaapp.MainActivity">
 
-    <!--&lt;!&ndash; TODO: Update blank fragment layout &ndash;&gt;
-    <TextView
+    <com.mancj.materialsearchbar.MaterialSearchBar
+        app:mt_speechMode="true"
+        app:mt_hint="Custom hint"
+        app:mt_maxSuggestionsCount="10"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/searchBar"
+        android:layout_alignParentStart="true" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/manga_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />-->
+        android:layout_above="@+id/site_link"
+        android:layout_below="@id/searchBar"
+        android:layout_alignParentStart="true" />
 
-</FrameLayout>
+    <android.support.design.widget.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:visibility="gone"
+        android:id="@+id/switch_source"/>
+
+    <TextView
+        android:id="@+id/site_link"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentStart="true"
+        android:linksClickable="true"
+        android:autoLink="all"
+        android:paddingBottom="5dp"
+        android:paddingTop="5dp"
+        android:gravity="center_horizontal"
+        android:text="Site Link" />
+
+</RelativeLayout>

@@ -8,6 +8,14 @@
     android:layout_height="match_parent"
     tools:context="manga.mangaapp.MainActivity">
 
+    <LinearLayout
+        android:id="@+id/container_frags"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:elevation="4dp"
+        android:layout_above="@id/site_link"
+        android:orientation="horizontal" />
+
     <com.mancj.materialsearchbar.MaterialSearchBar
         app:mt_speechMode="true"
         app:mt_hint="Custom hint"

@@ -2,6 +2,7 @@ package manga.mangaapp.MangaSide;
 
 import android.os.Handler;
 import android.os.Looper;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DividerItemDecoration;
@@ -24,6 +25,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.kingfisher.easy_sharedpreference_library.SharedPreferencesManager;
 import com.squareup.picasso.Picasso;
+import com.tapadoo.alerter.Alerter;
 
 import java.io.IOException;
 import java.net.URI;
@@ -61,7 +63,7 @@ public class MangaInfoActivity extends AppCompatActivity {
     TextView description;
     TextView link;
 
-    Button fav;
+    FloatingActionButton favButton;
 
     ChapterListAdapter chapterListAdapter;
 
@@ -72,6 +74,8 @@ public class MangaInfoActivity extends AppCompatActivity {
     List<Chapter> chapterList;
     Chapter[] chapters;
 
+    boolean favorited = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,7 +83,7 @@ public class MangaInfoActivity extends AppCompatActivity {
 
         imageView = findViewById(R.id.manga_cover);
 
-        fav = findViewById(R.id.favorite_manga);
+        favButton = findViewById(R.id.fav_button);
 
         title = findViewById(R.id.manga_title);
         description = findViewById(R.id.manga_description);
@@ -179,7 +183,7 @@ public class MangaInfoActivity extends AppCompatActivity {
 
                 setTitle(mangaDetails.getTitle());
 
-                fav.setOnClickListener(new View.OnClickListener() {
+                favButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
 
@@ -192,22 +196,81 @@ public class MangaInfoActivity extends AppCompatActivity {
                             // Write a message to the database
                             //FirebaseDatabase database = FirebaseDatabase.getInstance();
 
-                            FirebaseDatabaseUtil.writeNewUser();
+                            if(favorited) {
 
-                            FirebaseDatabaseUtil.writeNewPost(mangaID, chapterList.get((chapterList.size()-1) - chapterNum).getId(), mangaDetails.getTitle());
+                                FirebaseDatabaseUtil.removeData(mangaID);
+                                //fav.setText("Favorite");
+                                favorited = false;
+                                favButton.setImageResource(android.R.drawable.star_big_off);
+                                showAlert("UnFavorited", "I'm sorry you didn't enjoy it", android.R.drawable.star_big_off);
 
+                            } else {
+
+                                FirebaseDatabaseUtil.writeNewUser();
+
+                                FirebaseDatabaseUtil.writeNewPost(mangaID, chapterList.get((chapterList.size() - 1) - chapterNum).getId(), mangaDetails.getTitle());
+
+                                //fav.setText("UnFavorite");
+                                favorited = true;
+                                favButton.setImageResource(android.R.drawable.star_big_on);
+                                showAlert("Favorited", "Cool! I'm sure you'll enjoy it", android.R.drawable.star_big_on);
+
+                            }
+
+                        } else {
+                            //locally
                         }
                     }
                 });
 
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+                if (user != null) {
+
+                    FirebaseDatabase.getInstance().getReference("/user-posts/" + user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            for (DataSnapshot data : dataSnapshot.getChildren()) {
+
+                                if (data.getKey().equals(mangaID)) {
+                                    //do ur stuff
+                                    //fav.setText("UnFavorite");
+                                    favorited = true;
+                                    favButton.setImageResource(android.R.drawable.star_big_on);
+                                    break;
+                                } else {
+                                    //do something
+                                    //fav.setText("Favorite");
+                                    favorited = false;
+                                    favButton.setImageResource(android.R.drawable.star_big_off);
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+
+                }
 
 
             }
         }).execute();
 
+    }
 
-
-
+    public void showAlert(String title, String text, int resid) {
+        Alerter.create(this)
+                .setTitle(title)
+                .setText(text)
+                .enableSwipeToDismiss()
+                .setIcon(resid)
+                .enableIconPulse(false)
+                .showIcon(true)
+                .setBackgroundColorRes(R.color.colorPrimary)
+                .show();
     }
 
     public class ChapterCompare implements Comparator<Chapter> {

@@ -1,9 +1,15 @@
 package manga.mangaapp.UserInfo;
 
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -30,7 +36,7 @@ import manga.mangaapp.mangaedenclient.Manga;
 import manga.mangaapp.mangaedenclient.MangaDetails;
 import manga.mangaapp.mangaedenclient.MangaEdenClient;
 
-public class Favorites extends AppCompatActivity {
+public class Favorites extends Fragment {
 
     Map<String, UserInfo> map;
 
@@ -44,13 +50,39 @@ public class Favorites extends AppCompatActivity {
 
     ArrayList<Manga> mangaList;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_favorites);
+    Activity a;
 
-        mRecyclerView = findViewById(R.id.favorite_list);
-        mLayoutManager = new LinearLayoutManager(Favorites.this);
+    public Favorites() {
+        // Required empty public constructor
+    }
+
+    @SuppressLint("ValidFragment")
+    public Favorites(Activity a) {
+        // Required empty public constructor
+        this.a = a;
+    }
+
+
+    // TODO: Rename and change types and number of parameters
+    public static Favorites newInstance(Activity activity) {
+        Favorites fragment = new Favorites(activity);
+        return fragment;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        //setContentView(R.layout.activity_favorites);
+
+
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        mRecyclerView = getView().findViewById(R.id.favorite_list);
+        mLayoutManager = new LinearLayoutManager(a);
         mLayoutManager.setItemPrefetchEnabled(true);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
@@ -67,7 +99,13 @@ public class Favorites extends AppCompatActivity {
             Help.v("Hello there");
         }
 
+    }
 
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.activity_favorites, container, false);
     }
 
 
@@ -159,7 +197,7 @@ public class Favorites extends AppCompatActivity {
                 //Collections.sort(mangaArrayList, mangaSort(R.id.sort_date));
 
                 //set the adapter for real time searching
-                mAdapter = new MangaAdapter(mangaList, Favorites.this, client, Layouts.DETAILS);
+                mAdapter = new MangaAdapter(mangaList, a, client, Layouts.DETAILS);
                 mRecyclerView.setAdapter(mAdapter);
 
             }

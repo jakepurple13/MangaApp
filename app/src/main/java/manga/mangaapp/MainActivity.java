@@ -11,10 +11,12 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.Icon;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -42,6 +44,7 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -943,8 +946,33 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
             @Override
             public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
 
-                Intent i = new Intent(MainActivity.this, Favorites.class);
-                startActivity(i);
+                //Intent i = new Intent(MainActivity.this, Favorites.class);
+                //startActivity(i);
+
+                addFragment(Favorites.newInstance(MainActivity.this));
+
+                /*<LinearLayout
+                android:id="@+id/container_frags"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:layout_above="@id/site_link"
+                android:orientation="horizontal" />*/
+
+                return false;
+            }
+        });
+
+        PrimaryDrawerItem home = new PrimaryDrawerItem().withIdentifier(898).withSelectable(false).withName("Home").withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+            @Override
+            public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+
+                //Intent i = new Intent(MainActivity.this, Favorites.class);
+                //startActivity(i);
+
+                //replaceFragment(null);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    removeFragment();
+                }
 
                 return false;
             }
@@ -1119,6 +1147,7 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
                         layoutChangeChoice,
                         sortBy,
                         new DividerDrawerItem(),
+                        home,
                         gotoFavorites,
                         settings,
                         logout
@@ -1138,6 +1167,55 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
                 })
                 .build();
 
+    }
+
+    public void addFragment(Fragment fragment) {
+
+        LinearLayout ll = findViewById(R.id.container_frags);
+
+        ll.setBackgroundColor(Color.WHITE);
+
+        FragmentManager manager = getFragmentManager();
+        FragmentTransaction transaction = manager.beginTransaction();
+        transaction.add(R.id.container_frags,fragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
+
+        showFav = true;
+    }
+
+    boolean showFav = false;
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public void removeFragment() {
+
+       /* FragmentManager manager = getFragmentManager();
+        FragmentTransaction transaction = manager.beginTransaction();
+        transaction.remove(getFragmentManager().findFragmentById(R.id.container_frags));
+        transaction.addToBackStack(null);
+        transaction.commit();*/
+
+        //getFragmentManager().beginTransaction().remove(getFragmentManager().findFragmentById(R.id.container_frags)).commit();
+
+        for(Fragment fragment : getFragmentManager().getFragments()){
+
+            getFragmentManager().beginTransaction().remove(fragment).commit();
+
+        }
+
+        LinearLayout ll = findViewById(R.id.container_frags);
+
+        ll.setBackground(null);
+
+        showFav = false;
+    }
+
+    public void replaceFragment(Fragment fragment) {
+        FragmentManager manager = getFragmentManager();
+        FragmentTransaction transaction = manager.beginTransaction();
+        transaction.replace(R.id.container_frags,fragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
     }
 
     TagContainerLayout mTagContainerLayout;
@@ -1365,6 +1443,11 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
 
     @Override
     public void onBackPressed() {
+
+        if(showFav) {
+            removeFragment();
+        }
+
         //handle the back press :D close the drawer first and if the drawer is closed close the activity
         if (result != null && result.isDrawerOpen()) {
             result.closeDrawer();
@@ -1408,22 +1491,6 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
             }
             //new RetrieveManga(this).execute();
         }
-    }
-
-    public void addFragment(Fragment fragment) {
-        FragmentManager manager = getFragmentManager();
-        FragmentTransaction transaction = manager.beginTransaction();
-        transaction.add(R.id.container,fragment);
-        transaction.addToBackStack(null);
-        transaction.commit();
-    }
-
-    public void replaceFragment(Fragment fragment) {
-        FragmentManager manager = getFragmentManager();
-        FragmentTransaction transaction = manager.beginTransaction();
-        transaction.replace(R.id.container,fragment);
-        transaction.addToBackStack(null);
-        transaction.commit();
     }
 
     public void saveItems() {

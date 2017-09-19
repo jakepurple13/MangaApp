@@ -54,7 +54,6 @@
         android:id="@+id/chapter_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/favorite_manga"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/relativeLayout" />
 
@@ -62,21 +61,26 @@
         android:id="@+id/manga_link"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_toStartOf="@+id/fav_button"
+        android:autoLink="all"
         android:gravity="center_horizontal"
         android:linksClickable="true"
-        android:autoLink="all"
-        android:textIsSelectable="true"
         android:paddingBottom="5dp"
         android:paddingTop="5dp"
-        android:layout_alignParentBottom="true"
-        android:text="Link" />
+        android:text="Link"
+        android:textIsSelectable="true" />
 
-    <Button
-        android:id="@+id/favorite_manga"
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fav_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/manga_link"
+        android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
-        android:text="Favorite" />
+
+        app:useCompatPadding="true"
+        android:clickable="true"
+        app:srcCompat="@android:drawable/btn_star_big_off" />
 
 </RelativeLayout>

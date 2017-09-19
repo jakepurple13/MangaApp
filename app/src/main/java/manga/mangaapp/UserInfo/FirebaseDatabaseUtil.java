@@ -57,4 +57,8 @@ public class FirebaseDatabaseUtil {
 
     }
 
+    public static void removeData(String mangaid) {
+        FirebaseDatabase.getInstance().getReference("/user-posts/" + FirebaseAuth.getInstance().getCurrentUser().getUid() + "/" + mangaid).removeValue();
+    }
+
 }

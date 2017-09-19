@@ -29,7 +29,8 @@
         <activity
             android:name=".MangaSide.ReadMangaSite"
             android:theme="@style/Base.Theme.AppCompat.NoBar" />
-        <activity android:name=".UserInfo.Favorites"></activity>
+        <activity android:name=".UserInfo.Favorites" />
+        <activity android:name=".MainHub"></activity>
     </application>
 
 </manifest>
