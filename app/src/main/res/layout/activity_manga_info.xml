@@ -64,7 +64,6 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
-        android:layout_toStartOf="@+id/fav_button"
         android:autoLink="all"
         android:gravity="center_horizontal"
         android:linksClickable="true"
