@@ -970,9 +970,7 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
                 //startActivity(i);
 
                 //replaceFragment(null);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    removeFragment();
-                }
+                removeFragment();
 
                 return false;
             }
@@ -1186,7 +1184,6 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
 
     boolean showFav = false;
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     public void removeFragment() {
 
        /* FragmentManager manager = getFragmentManager();
@@ -1197,10 +1194,18 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
 
         //getFragmentManager().beginTransaction().remove(getFragmentManager().findFragmentById(R.id.container_frags)).commit();
 
-        for(Fragment fragment : getFragmentManager().getFragments()){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            for(Fragment fragment : getFragmentManager().getFragments()) {
 
-            getFragmentManager().beginTransaction().remove(fragment).commit();
+                getFragmentManager().beginTransaction().remove(fragment).commit();
 
+            }
+        } else {
+            for(android.support.v4.app.Fragment fragment : getSupportFragmentManager().getFragments()){
+
+                getSupportFragmentManager().beginTransaction().remove(fragment).commit();
+
+            }
         }
 
         LinearLayout ll = findViewById(R.id.container_frags);
