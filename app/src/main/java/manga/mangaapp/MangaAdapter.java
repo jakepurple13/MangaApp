@@ -2,10 +2,13 @@ package manga.mangaapp;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v7.widget.RecyclerView;
+import android.text.SpannableString;
+import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -117,6 +120,7 @@ public class MangaAdapter extends RecyclerView.Adapter<MangaAdapter.ViewHolder>{
         TextView tv = holder.mTextView;
         final ImageView ib = holder.imageView;
         tv.setText(mDataset.get(position).getTitle());
+        tv.setTypeface(null, Typeface.BOLD);
 
         final Manga manga = mDataset.get(position);
 
@@ -141,7 +145,7 @@ public class MangaAdapter extends RecyclerView.Adapter<MangaAdapter.ViewHolder>{
                         // Get chapter page image URLs
                         //final URI imageUrl = pages[0].getImageURI();
                         final URI imageUrl = MangaEden.manga2ImageURI(mangaDetails.getImage());
-                        final String detail = "\nChapter Count: " + chapters.length+"\n"+mangaDetails.getDescription();
+                        final String detail = "Chapter Count: " + chapters.length+"\n\n"+mangaDetails.getDescription();
                         Handler uiHandler = new Handler(Looper.getMainLooper());
                         uiHandler.post(new Runnable() {
                             @Override

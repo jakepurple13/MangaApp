@@ -21,6 +21,8 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -195,6 +197,13 @@ public class Favorites extends Fragment {
             @Override
             public void onPostExecute(Boolean success) {
                 //Collections.sort(mangaArrayList, mangaSort(R.id.sort_date));
+
+                Collections.sort(mangaList, new Comparator<Manga>() {
+                    @Override
+                    public int compare(Manga manga, Manga t1) {
+                        return manga.getTitle().compareTo(t1.getTitle());
+                    }
+                });
 
                 //set the adapter for real time searching
                 mAdapter = new MangaAdapter(mangaList, a, client, Layouts.DETAILS);

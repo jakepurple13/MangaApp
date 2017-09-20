@@ -174,6 +174,7 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
     ProfileDrawerItem profileDrawerItem;
     AccountHeader headerResult;
     Drawer result;
+    PrimaryDrawerItem logout;
 
     TextView siteLink;
 
@@ -602,18 +603,9 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
                 }
 
                 if (tag.equals(GenreTags.Sources.MANGAEDEN)) {
-                    result.addItemAtPosition(new PrimaryDrawerItem().withIdentifier(2).withSelectable(false).withName("Genre Search").withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
-                        @Override
-                        public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-
-                            genreSearch();
-
-                            return false;
-                        }
-                    }), 1);
                     getMangaEden();
                 } else {
-                    result.removeItem(2);
+                    //result.removeItem(2);
                     //List<Site> siteList = SiteHelper.getSites();
                     try {
                         Log.e("Line_" + new Throwable().getStackTrace()[0].getLineNumber(), currentSite.getMangaList().size()+" manga titles");
@@ -661,6 +653,11 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
 
         if(currentUser!=null) {
             updateUI(currentUser);
+            logout.withName("Logout");
+            result.updateItem(logout);
+        } else {
+            logout.withName("Login");
+            result.updateItem(logout);
         }
 
         /*FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -682,7 +679,7 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
     }
 
     public void updateUI(FirebaseUser user) {
-        profileDrawerItem.withIcon(user.getPhotoUrl());
+        //profileDrawerItem.withIcon(user.getPhotoUrl());
         profileDrawerItem.withEmail(user.getEmail());
         profileDrawerItem.withName(user.getDisplayName());
         headerResult.updateProfile(profileDrawerItem);
@@ -704,12 +701,18 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
                             FirebaseUser user = mAuth.getCurrentUser();
                             updateUI(user);
 
+                            logout.withName("Login");
+                            result.updateItem(logout);
+
                         } else {
                             // If sign in fails, display a message to the user.
                             Help.w("signInWithEmail:failure", task.getException().toString());
                             Toast.makeText(MainActivity.this, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
-                            updateUI(null);
+                            //updateUI(null);
+
+                            logout.withName("Logout");
+                            result.updateItem(logout);
                         }
 
                         lovelyProgressDialog.dismiss();
@@ -736,12 +739,19 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
                             updateUI(user);
                             user.sendEmailVerification();
 
+                            logout.withName("Login");
+                            result.updateItem(logout);
+
                         } else {
                             // If sign in fails, display a message to the user.
                             Help.w("createUserWithEmail:failure", task.getException().toString());
                             Toast.makeText(MainActivity.this, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
-                            updateUI(null);
+                            //task.getException().printStackTrace();
+                            //updateUI(null);
+
+                            logout.withName("Logout");
+                            result.updateItem(logout);
                         }
 
                         lovelyProgressDialog.dismiss();
@@ -749,6 +759,109 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
                         // ...
                     }
                 });
+    }
+
+    public void login() {
+        final LovelyCustomDialog customDialog = new LovelyCustomDialog(MainActivity.this)
+                .setView(R.layout.account_choice)
+                .setTopColorRes(R.color.md_blue_A400)
+                .setTitle("Account")
+                .setMessage("Sign in or Sign Up")
+                .setTitleGravity(Gravity.CENTER_HORIZONTAL)
+                .setMessageGravity(Gravity.CENTER_HORIZONTAL)
+                .setIcon(R.drawable.ic_menu_black_24dp);
+
+        customDialog.configureView(new LovelyCustomDialog.ViewConfigurator() {
+            @Override
+            public void configureView(View v) {
+
+                Button signInButton = v.findViewById(R.id.signin);
+
+                Button signUpButton = v.findViewById(R.id.signup);
+
+                signInButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+
+                        final LovelyCustomDialog signInDialog = new LovelyCustomDialog(MainActivity.this)
+                                .setView(R.layout.sign_in_or_up)
+                                .setTopColorRes(R.color.md_blue_A400)
+                                .setTitle("Sign In")
+                                .setMessage("Sign in")
+                                .setTitleGravity(Gravity.CENTER_HORIZONTAL)
+                                .setMessageGravity(Gravity.CENTER_HORIZONTAL)
+                                .setIcon(R.drawable.ic_menu_black_24dp);
+
+                        signInDialog.configureView(new LovelyCustomDialog.ViewConfigurator() {
+                            @Override
+                            public void configureView(View v) {
+
+                                final EditText email = v.findViewById(R.id.email);
+                                final EditText password = v.findViewById(R.id.password);
+                                Button submit = v.findViewById(R.id.submit);
+
+                                submit.setText("Sign In");
+
+                                submit.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        customDialog.dismiss();
+                                        signInDialog.dismiss();
+                                        signIn(email.getText().toString(), password.getText().toString());
+                                    }
+                                });
+
+                            }
+                        });
+
+                        signInDialog.show();
+
+                    }
+                });
+
+                signUpButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+
+                        final LovelyCustomDialog signUpDialog = new LovelyCustomDialog(MainActivity.this)
+                                .setView(R.layout.sign_in_or_up)
+                                .setTopColorRes(R.color.md_blue_A400)
+                                .setTitle("Sign Up")
+                                .setMessage("Sign Up")
+                                .setTitleGravity(Gravity.CENTER_HORIZONTAL)
+                                .setMessageGravity(Gravity.CENTER_HORIZONTAL)
+                                .setIcon(R.drawable.ic_menu_black_24dp);
+
+                        signUpDialog.configureView(new LovelyCustomDialog.ViewConfigurator() {
+                            @Override
+                            public void configureView(View v) {
+
+                                final EditText email = v.findViewById(R.id.email);
+                                final EditText password = v.findViewById(R.id.password);
+                                Button submit = v.findViewById(R.id.submit);
+
+                                submit.setText("Sign Up");
+
+                                submit.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        customDialog.dismiss();
+                                        signUpDialog.dismiss();
+                                        signUp(email.getText().toString(), password.getText().toString());
+                                    }
+                                });
+
+                                signUpDialog.show();
+
+                            }
+                        });
+                    }
+                });
+
+            }
+        });
+
+        customDialog.show();
     }
 
     ArrayList<Manga> alm = new ArrayList<>();
@@ -766,104 +879,7 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
 
                         if(mAuth.getCurrentUser()==null) {
 
-                            final LovelyCustomDialog customDialog = new LovelyCustomDialog(MainActivity.this)
-                                    .setView(R.layout.account_choice)
-                                    .setTopColorRes(R.color.md_blue_A400)
-                                    .setTitle("Account")
-                                    .setMessage("Sign in or Sign Up")
-                                    .setTitleGravity(Gravity.CENTER_HORIZONTAL)
-                                    .setMessageGravity(Gravity.CENTER_HORIZONTAL)
-                                    .setIcon(R.drawable.ic_menu_black_24dp);
-
-                            customDialog.configureView(new LovelyCustomDialog.ViewConfigurator() {
-                                @Override
-                                public void configureView(View v) {
-
-                                    Button signInButton = v.findViewById(R.id.signin);
-
-                                    Button signUpButton = v.findViewById(R.id.signup);
-
-                                    signInButton.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View view) {
-
-                                            final LovelyCustomDialog signInDialog = new LovelyCustomDialog(MainActivity.this)
-                                                    .setView(R.layout.sign_in_or_up)
-                                                    .setTopColorRes(R.color.md_blue_A400)
-                                                    .setTitle("Sign In")
-                                                    .setMessage("Sign in")
-                                                    .setTitleGravity(Gravity.CENTER_HORIZONTAL)
-                                                    .setMessageGravity(Gravity.CENTER_HORIZONTAL)
-                                                    .setIcon(R.drawable.ic_menu_black_24dp);
-
-                                            signInDialog.configureView(new LovelyCustomDialog.ViewConfigurator() {
-                                                @Override
-                                                public void configureView(View v) {
-
-                                                    final EditText email = v.findViewById(R.id.email);
-                                                    final EditText password = v.findViewById(R.id.password);
-                                                    Button submit = v.findViewById(R.id.submit);
-
-                                                    submit.setText("Sign In");
-
-                                                    submit.setOnClickListener(new View.OnClickListener() {
-                                                        @Override
-                                                        public void onClick(View view) {
-                                                            signInDialog.dismiss();
-                                                            signIn(email.getText().toString(), password.getText().toString());
-                                                        }
-                                                    });
-
-                                                }
-                                            });
-
-                                            signInDialog.show();
-
-                                        }
-                                    });
-
-                                    signUpButton.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View view) {
-
-                                            final LovelyCustomDialog signUpDialog = new LovelyCustomDialog(MainActivity.this)
-                                                    .setView(R.layout.sign_in_or_up)
-                                                    .setTopColorRes(R.color.md_blue_A400)
-                                                    .setTitle("Sign Up")
-                                                    .setMessage("Sign Up")
-                                                    .setTitleGravity(Gravity.CENTER_HORIZONTAL)
-                                                    .setMessageGravity(Gravity.CENTER_HORIZONTAL)
-                                                    .setIcon(R.drawable.ic_menu_black_24dp);
-
-                                            signUpDialog.configureView(new LovelyCustomDialog.ViewConfigurator() {
-                                                @Override
-                                                public void configureView(View v) {
-
-                                                    final EditText email = v.findViewById(R.id.email);
-                                                    final EditText password = v.findViewById(R.id.password);
-                                                    Button submit = v.findViewById(R.id.submit);
-
-                                                    submit.setText("Sign Up");
-
-                                                    submit.setOnClickListener(new View.OnClickListener() {
-                                                        @Override
-                                                        public void onClick(View view) {
-                                                            signUpDialog.dismiss();
-                                                            signUp(email.getText().toString(), password.getText().toString());
-                                                        }
-                                                    });
-
-                                                    signUpDialog.show();
-
-                                                }
-                                            });
-                                        }
-                                    });
-
-                                }
-                            });
-
-                            customDialog.show();
+                            login();
 
                         } else {
                             EasyImage.openChooserWithGallery(MainActivity.this, "Choose a new Profile Picture", 1);
@@ -976,11 +992,15 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
             }
         });
 
-        PrimaryDrawerItem logout = new PrimaryDrawerItem().withIdentifier(89).withSelectable(false).withName("Logout").withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+        logout = new PrimaryDrawerItem().withIdentifier(89).withSelectable(false).withName("Logout").withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
             @Override
             public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
 
-                mAuth.signOut();
+                if(mAuth.getCurrentUser()!=null) {
+                    mAuth.signOut();
+                } else {
+                    login();
+                }
 
                 return false;
             }
@@ -1139,7 +1159,7 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
                 .withKeepStickyItemsVisible(true)
                 .addDrawerItems(
                         sourceChange,
-                        //genreChange,
+                        genreChange,
                         new DividerDrawerItem(),
                         //layoutChange,
                         layoutChangeChoice,

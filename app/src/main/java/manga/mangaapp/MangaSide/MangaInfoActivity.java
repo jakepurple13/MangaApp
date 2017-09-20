@@ -76,6 +76,8 @@ public class MangaInfoActivity extends AppCompatActivity {
 
     boolean favorited = false;
 
+    String chapterID;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -96,6 +98,55 @@ public class MangaInfoActivity extends AppCompatActivity {
         mRecyclerView.addItemDecoration(new DividerItemDecoration(this,DividerItemDecoration.VERTICAL ));
 
         final String mangaID = getIntent().getStringExtra("manga_id");
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        chapterID = "";
+
+        if (user != null) {
+
+            FirebaseDatabase.getInstance().getReference("/user-posts/" + user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    for (DataSnapshot data : dataSnapshot.getChildren()) {
+
+                        if (data.getKey().equals(mangaID)) {
+                            //do ur stuff
+                            //fav.setText("UnFavorite");
+                            favorited = true;
+                            favButton.setImageResource(android.R.drawable.star_big_on);
+                            for (DataSnapshot postSnapshot1: data.getChildren()) {
+
+                                Help.i(postSnapshot1.toString());
+
+                                switch (postSnapshot1.getKey()) {
+                                    case "chapterid":
+                                        chapterID = postSnapshot1.getValue(String.class);
+                                        break;
+                                    default:
+                                        break;
+
+                                }
+
+                            }
+                            break;
+                        } else {
+                            //do something
+                            //fav.setText("Favorite");
+                            favorited = false;
+                            favButton.setImageResource(android.R.drawable.star_big_off);
+                        }
+
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+
+        }
 
         final int chapterNum = SharedPreferencesManager.getInstance().getValue(mangaID, Integer.class, 0);
 
@@ -166,7 +217,16 @@ public class MangaInfoActivity extends AppCompatActivity {
                     }
                 });
 
-                chapterListAdapter = new ChapterListAdapter(chapters, MangaInfoActivity.this, mangaID, chapterNum);
+                int num = 0;
+
+                for(Chapter c : chapters) {
+                    if(c.getId().equals(chapterID)) {
+                        num = c.getNumber();
+                    }
+                }
+
+                //chapterListAdapter = new ChapterListAdapter(chapters, MangaInfoActivity.this, mangaID, chapterNum);
+                chapterListAdapter = new ChapterListAdapter(chapters, MangaInfoActivity.this, mangaID, num);
                 mRecyclerView.setAdapter(chapterListAdapter);
                 String titleText = mangaDetails.getTitle() + "\nTags: ";
 
@@ -208,8 +268,15 @@ public class MangaInfoActivity extends AppCompatActivity {
 
                                 FirebaseDatabaseUtil.writeNewUser();
 
-                                FirebaseDatabaseUtil.writeNewPost(mangaID, chapterList.get((chapterList.size() - 1) - chapterNum).getId(), mangaDetails.getTitle());
+                                try {
 
+                                    FirebaseDatabaseUtil.writeNewPost(mangaID, chapterList.get((chapterList.size() - 1) - chapterNum).getId(), mangaDetails.getTitle());
+
+                                } catch(ArrayIndexOutOfBoundsException e) {
+
+                                    FirebaseDatabaseUtil.writeNewPost(mangaID, "", mangaDetails.getTitle());
+
+                                }
                                 //fav.setText("UnFavorite");
                                 favorited = true;
                                 favButton.setImageResource(android.R.drawable.star_big_on);
@@ -222,39 +289,6 @@ public class MangaInfoActivity extends AppCompatActivity {
                         }
                     }
                 });
-
-                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-
-                if (user != null) {
-
-                    FirebaseDatabase.getInstance().getReference("/user-posts/" + user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            for (DataSnapshot data : dataSnapshot.getChildren()) {
-
-                                if (data.getKey().equals(mangaID)) {
-                                    //do ur stuff
-                                    //fav.setText("UnFavorite");
-                                    favorited = true;
-                                    favButton.setImageResource(android.R.drawable.star_big_on);
-                                    break;
-                                } else {
-                                    //do something
-                                    //fav.setText("Favorite");
-                                    favorited = false;
-                                    favButton.setImageResource(android.R.drawable.star_big_off);
-                                }
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-
-                        }
-                    });
-
-                }
-
 
             }
         }).execute();

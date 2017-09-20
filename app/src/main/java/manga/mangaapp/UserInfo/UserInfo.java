@@ -18,6 +18,7 @@ public class UserInfo {
     String mangaID;
     String chapterID;
     String mangaTitle;
+    boolean favorited = false;
 
     public UserInfo() {
 
@@ -35,6 +36,14 @@ public class UserInfo {
         this.mangaID = mangaID;
         this.chapterID = chapterID;
         this.mangaTitle = mangaTitle;
+    }
+
+    public UserInfo(String uid, String mangaID, String chapterID, String mangaTitle, boolean favorited) {
+        this.uid = uid;
+        this.mangaID = mangaID;
+        this.chapterID = chapterID;
+        this.mangaTitle = mangaTitle;
+        this.favorited = favorited;
     }
 
     @Exclude

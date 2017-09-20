@@ -4,8 +4,10 @@ import android.app.Application;
 import android.content.Context;
 import android.support.multidex.MultiDex;
 
+import com.crashlytics.android.Crashlytics;
 import com.kingfisher.easy_sharedpreference_library.SharedPreferencesManager;
 
+import io.fabric.sdk.android.Fabric;
 import manga.mangaapp.manymanga.sites.Site;
 
 /**
@@ -19,6 +21,7 @@ public class StoryWorld extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        Fabric.with(this, new Crashlytics());
         SharedPreferencesManager.init(this, true);
     }
 

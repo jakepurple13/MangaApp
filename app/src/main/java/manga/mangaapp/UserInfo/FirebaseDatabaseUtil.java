@@ -53,8 +53,9 @@ public class FirebaseDatabaseUtil {
         Query myTopPostsQuery = FirebaseDatabase.getInstance().getReference().child("user-posts").child(myUserId);
 
         // My top posts by number of stars
-        myTopPostsQuery.addValueEventListener(valueEventListener);
+        //myTopPostsQuery.addValueEventListener(valueEventListener);
 
+        myTopPostsQuery.addListenerForSingleValueEvent(valueEventListener);
     }
 
     public static void removeData(String mangaid) {
