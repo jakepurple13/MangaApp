@@ -59,6 +59,8 @@ dependencies {
     }
 
     compile 'com.tapadoo.android:alerter:2.0.1'
+    compile 'com.yashoid:instacropper:1.0.6'
+    compile 'in.cubestack.android.lib:storm:1.0g'
 
     compile "com.mikepenz:iconics-core:2.9.1@aar"
     compile 'com.mikepenz:google-material-typeface:3.0.1.1.original@aar'
@@ -101,8 +103,6 @@ dependencies {
     compile 'org.jsoup:jsoup:1.10.3'
 
     compile 'com.truizlop.fabreveallayout:library:1.0.0'
-
-    //compile group: 'com.thoughtworks.xstream', name: 'xstream', version: '1.4.10'
 
     compile "commons-io:commons-io:2.5"
 

@@ -27,6 +27,8 @@ import com.kingfisher.easy_sharedpreference_library.SharedPreferencesManager;
 import com.squareup.picasso.Picasso;
 import com.tapadoo.alerter.Alerter;
 
+import junit.framework.Assert;
+
 import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
@@ -37,11 +39,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import in.cubestack.android.lib.storm.service.BaseService;
+import in.cubestack.android.lib.storm.service.StormService;
 import manga.mangaapp.AsyncTasks;
 import manga.mangaapp.Help;
 import manga.mangaapp.R;
 import manga.mangaapp.RetrieveInfo;
 import manga.mangaapp.UserInfo.FirebaseDatabaseUtil;
+import manga.mangaapp.UserInfo.MangaDatabase;
+import manga.mangaapp.UserInfo.MangaTable;
 import manga.mangaapp.UserInfo.UserInfo;
 import manga.mangaapp.mangaedenclient.Chapter;
 import manga.mangaapp.mangaedenclient.ChapterDetails;
@@ -146,6 +152,16 @@ public class MangaInfoActivity extends AppCompatActivity {
                 }
             });
 
+        } else {
+            MangaTable mt = FirebaseDatabaseUtil.findLocal(this, mangaID);
+            if(mt!=null) {
+                favorited = true;
+                favButton.setImageResource(android.R.drawable.star_big_on);
+                chapterID = mt.getChapterID();
+            } else {
+                favorited = false;
+                favButton.setImageResource(android.R.drawable.star_big_off);
+            }
         }
 
         final int chapterNum = SharedPreferencesManager.getInstance().getValue(mangaID, Integer.class, 0);
@@ -217,16 +233,7 @@ public class MangaInfoActivity extends AppCompatActivity {
                     }
                 });
 
-                int num = 0;
-
-                for(Chapter c : chapters) {
-                    if(c.getId().equals(chapterID)) {
-                        num = c.getNumber();
-                    }
-                }
-
-                //chapterListAdapter = new ChapterListAdapter(chapters, MangaInfoActivity.this, mangaID, chapterNum);
-                chapterListAdapter = new ChapterListAdapter(chapters, MangaInfoActivity.this, mangaID, num);
+                chapterListAdapter = new ChapterListAdapter(chapters, MangaInfoActivity.this, mangaID, chapterID, mangaDetails.getTitle());
                 mRecyclerView.setAdapter(chapterListAdapter);
                 String titleText = mangaDetails.getTitle() + "\nTags: ";
 
@@ -251,47 +258,55 @@ public class MangaInfoActivity extends AppCompatActivity {
 
                         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
-                        if (user != null) {
-
-                            // Write a message to the database
-                            //FirebaseDatabase database = FirebaseDatabase.getInstance();
-
-                            if(favorited) {
-
-                                FirebaseDatabaseUtil.removeData(mangaID);
-                                //fav.setText("Favorite");
-                                favorited = false;
-                                favButton.setImageResource(android.R.drawable.star_big_off);
-                                showAlert("UnFavorited", "I'm sorry you didn't enjoy it", android.R.drawable.star_big_off);
-
-                            } else {
-
-                                FirebaseDatabaseUtil.writeNewUser();
-
-                                try {
-
-                                    FirebaseDatabaseUtil.writeNewPost(mangaID, chapterList.get((chapterList.size() - 1) - chapterNum).getId(), mangaDetails.getTitle());
-
-                                } catch(ArrayIndexOutOfBoundsException e) {
-
-                                    FirebaseDatabaseUtil.writeNewPost(mangaID, "", mangaDetails.getTitle());
-
-                                }
-                                //fav.setText("UnFavorite");
-                                favorited = true;
-                                favButton.setImageResource(android.R.drawable.star_big_on);
-                                showAlert("Favorited", "Cool! I'm sure you'll enjoy it", android.R.drawable.star_big_on);
-
-                            }
-
+                        if(favorited) {
+                            unFavorite(mangaID, user);
                         } else {
-                            //locally
+                            favorite(mangaID, mangaDetails.getTitle(), user);
                         }
+
                     }
                 });
 
             }
         }).execute();
+
+    }
+
+    public void favorite(String mangaID, String title, FirebaseUser user) {
+        FirebaseDatabaseUtil.saveLocal(MangaInfoActivity.this, mangaID, title, "");
+
+        showAlert("Favorited", "Cool! I'm sure you'll enjoy it", android.R.drawable.star_big_on);
+
+        if(user!=null) {
+
+            FirebaseDatabaseUtil.writeNewUser();
+
+            try {
+
+                FirebaseDatabaseUtil.writeNewPost(mangaID, "", mangaDetails.getTitle());
+
+            } catch (ArrayIndexOutOfBoundsException e) {
+
+                FirebaseDatabaseUtil.writeNewPost(mangaID, "", mangaDetails.getTitle());
+
+            }
+
+        }
+        favorited = true;
+        favButton.setImageResource(android.R.drawable.star_big_on);
+    }
+
+    public void unFavorite(String mangaID, FirebaseUser user) {
+
+        FirebaseDatabaseUtil.deleteLocal(MangaInfoActivity.this, mangaID, mangaDetails.getTitle());
+
+        if(user!=null) {
+            FirebaseDatabaseUtil.removeData(mangaID);
+        }
+
+        favorited = false;
+        favButton.setImageResource(android.R.drawable.star_big_off);
+        showAlert("UnFavorited", "I'm sorry you didn't enjoy it", android.R.drawable.star_big_off);
 
     }
 

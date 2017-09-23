@@ -36,7 +36,8 @@ public class ChapterListAdapter extends RecyclerView.Adapter<ChapterListAdapter.
     //Contact activity
     Activity in;
     String mangaID;
-    int currentChapter;
+    String currentChapter;
+    String mangaTitle;
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -62,11 +63,12 @@ public class ChapterListAdapter extends RecyclerView.Adapter<ChapterListAdapter.
         mDataset = myDataset;
         this.in = in;
     }*/
-    public ChapterListAdapter(Chapter[] myDataset, Activity in, String mangaID, int currentChapter) {
+    public ChapterListAdapter(Chapter[] myDataset, Activity in, String mangaID, String currentChapter, String title) {
         mDataset = myDataset;
         this.in = in;
         this.mangaID = mangaID;
         this.currentChapter = currentChapter;
+        this.mangaTitle = title;
     }
 
     // Create new views (invoked by the layout manager)
@@ -90,7 +92,7 @@ public class ChapterListAdapter extends RecyclerView.Adapter<ChapterListAdapter.
         ib.setVisibility(View.GONE);
         String title = mDataset[position].getTitle()!=null ? mDataset[position].getTitle() : "";
         String text = mDataset[position].getNumber() + ". " + title;
-        if(currentChapter==(mDataset.length-position)) {
+        if(currentChapter.equals(mDataset[position].getId())) {
             text+="\t<--";
         }
         tv.setText(text);
@@ -106,6 +108,7 @@ public class ChapterListAdapter extends RecyclerView.Adapter<ChapterListAdapter.
                 intent.putExtra("chapter_id", mDataset[position].getId());
                 intent.putExtra("chapter_number", mDataset[position].getNumber());
                 intent.putExtra("manga_id", mangaID);
+                intent.putExtra("manga_title", mangaTitle);
                 in.startActivity(intent);
             }
         };

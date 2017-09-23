@@ -34,6 +34,10 @@ allprojects {
         maven {
             url 'http://dl.bintray.com/s64/maven'
         }
+
+        maven {
+            url "http://dl.bintray.com/cubestack/maven"
+        }
     }
 }
 

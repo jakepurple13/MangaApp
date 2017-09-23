@@ -26,6 +26,8 @@ import android.widget.TextView;
 
 import com.gigamole.infinitecycleviewpager.HorizontalInfiniteCycleViewPager;
 import com.gigamole.infinitecycleviewpager.OnInfiniteCyclePageTransformListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.kingfisher.easy_sharedpreference_library.SharedPreferencesManager;
 import com.squareup.picasso.Picasso;
 import com.truizlop.fabreveallayout.FABRevealLayout;
@@ -42,6 +44,8 @@ import manga.mangaapp.AsyncTasks;
 import manga.mangaapp.Help;
 import manga.mangaapp.R;
 import manga.mangaapp.RetrieveInfo;
+import manga.mangaapp.UserInfo.FirebaseDatabaseUtil;
+import manga.mangaapp.UserInfo.MangaTable;
 import manga.mangaapp.mangaedenclient.Chapter;
 import manga.mangaapp.mangaedenclient.ChapterDetails;
 import manga.mangaapp.mangaedenclient.ChapterPage;
@@ -91,7 +95,21 @@ public class ReadManga extends AppCompatActivity {
 
         final String chapterID = getIntent().getStringExtra("chapter_id");
         final String mangaID = getIntent().getStringExtra("manga_id");
+        final String mangaTitle = getIntent().getStringExtra("manga_title");
         final int chapterNumber = getIntent().getIntExtra("chapter_number", 0);
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        try {
+            FirebaseDatabaseUtil.updateChapterLocal(ReadManga.this, mangaID, chapterID);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if(user!=null) {
+            FirebaseDatabaseUtil.writeNewPost(mangaID, chapterID, mangaTitle);
+        }
+
 
         layout = findViewById(R.id.reading_layout);
 
@@ -205,6 +223,19 @@ public class ReadManga extends AppCompatActivity {
                                     seekBar.setMax(pages.length);
                                     seekBar.setProgress(0);
                                     viewPager.setCurrentItem(0, true);
+
+                                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+                                    try {
+                                        FirebaseDatabaseUtil.updateChapterLocal(ReadManga.this, mangaID, chapID);
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+
+                                    if(user!=null) {
+                                        FirebaseDatabaseUtil.writeNewPost(mangaID, chapID, mangaTitle);
+                                    }
+
                                 }
                             });
 

@@ -90,6 +90,7 @@ import com.mikepenz.materialdrawer.util.DrawerImageLoader;
 import com.squareup.picasso.Picasso;
 import com.yarolegovich.lovelydialog.LovelyCustomDialog;
 import com.yarolegovich.lovelydialog.LovelyProgressDialog;
+import com.yashoid.instacropper.InstaCropperActivity;
 
 import net.alhazmy13.gota.Gota;
 import net.alhazmy13.gota.GotaResponse;
@@ -179,6 +180,9 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
     TextView siteLink;
 
     private FirebaseAuth mAuth;
+
+    final int IMAGE_PICKED = 12;
+    final int REQUEST_CROP = 13;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -1485,21 +1489,36 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        EasyImage.handleActivityResult(requestCode, resultCode, data, this, new DefaultCallback() {
-            @Override
-            public void onImagePickerError(Exception e, EasyImage.ImageSource source, int type) {
-                //Some error handling
-            }
+        Help.w("Request code: " + requestCode, "Result code: " + resultCode);
 
-            @Override
-            public void onImagePicked(File imageFile, EasyImage.ImageSource source, int type) {
-                //Handle the images
-                //onPhotosReturned(imagesFiles);
-                SharedPreferencesManager.getInstance().putValue("profile_image", imageFile.getPath());
-                profileDrawerItem.withIcon(Uri.fromFile(imageFile));
-                headerResult.updateProfile(profileDrawerItem);
-            }
-        });
+        if(requestCode==EasyImage.REQ_SOURCE_CHOOSER) {
+
+            EasyImage.handleActivityResult(requestCode, resultCode, data, this, new DefaultCallback() {
+                @Override
+                public void onImagePickerError(Exception e, EasyImage.ImageSource source, int type) {
+                    //Some error handling
+                }
+
+                @Override
+                public void onImagePicked(File imageFile, EasyImage.ImageSource source, int type) {
+                    //Handle the images
+                    //onPhotosReturned(imagesFiles);
+                    SharedPreferencesManager.getInstance().putValue("profile_image", imageFile.getPath());
+
+                    Intent intent = InstaCropperActivity.getIntent(MainActivity.this, Uri.fromFile(imageFile), Uri.fromFile(new File(getExternalCacheDir(), "manga_profile.png")), 600, 50);
+                    startActivityForResult(intent, REQUEST_CROP);
+
+                }
+            });
+
+        } else if(requestCode==REQUEST_CROP) {
+
+            profileDrawerItem.withIcon(data.getData());
+            headerResult.updateProfile(profileDrawerItem);
+
+            SharedPreferencesManager.getInstance().putValue("profile_image", data.getData().getPath());
+
+        }
     }
 
     @Override
