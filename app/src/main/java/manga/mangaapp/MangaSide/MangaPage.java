@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bogdwellers.pinchtozoom.ImageMatrixTouchHandler;
 import com.squareup.picasso.Picasso;
 
 import java.net.URI;
@@ -56,6 +57,7 @@ public class MangaPage extends PagerAdapter {
             view = LayoutInflater.from(activity).inflate(R.layout.manga_page_layout, container, false);
 
             final ImageView iv = view.findViewById(R.id.manga_page);
+            iv.setOnTouchListener(new ImageMatrixTouchHandler(view.getContext()));
 
             final URI imageUrl = pages[position].getImageURI();
             Handler uiHandler = new Handler(Looper.getMainLooper());

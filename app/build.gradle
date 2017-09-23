@@ -53,6 +53,7 @@ dependencies {
     }
 
     compile 'org.adw.library:discrete-seekbar:1.0.1'
+    compile 'com.bogdwellers:pinchtozoom:0.1'
 
     compile("jp.s64.android:animatedtoolbar:${animated_toolbar_version}") {
         exclude group: 'com.android.support', module: 'appcompat-v7'
