@@ -1,14 +1,21 @@
 package manga.mangaapp.MangaSide;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ShareCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -83,11 +90,16 @@ public class MangaInfoActivity extends AppCompatActivity {
     boolean favorited = false;
 
     String chapterID;
+    String mangaID;
+
+    String mangaTitle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_manga_info);
+
+        handleIntent(getIntent());
 
         imageView = findViewById(R.id.manga_cover);
 
@@ -101,9 +113,7 @@ public class MangaInfoActivity extends AppCompatActivity {
 
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
-        mRecyclerView.addItemDecoration(new DividerItemDecoration(this,DividerItemDecoration.VERTICAL ));
-
-        final String mangaID = getIntent().getStringExtra("manga_id");
+        mRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
@@ -121,7 +131,7 @@ public class MangaInfoActivity extends AppCompatActivity {
                             //fav.setText("UnFavorite");
                             favorited = true;
                             favButton.setImageResource(android.R.drawable.star_big_on);
-                            for (DataSnapshot postSnapshot1: data.getChildren()) {
+                            for (DataSnapshot postSnapshot1 : data.getChildren()) {
 
                                 Help.i(postSnapshot1.toString());
 
@@ -154,7 +164,7 @@ public class MangaInfoActivity extends AppCompatActivity {
 
         } else {
             MangaTable mt = FirebaseDatabaseUtil.findLocal(this, mangaID);
-            if(mt!=null) {
+            if (mt != null) {
                 favorited = true;
                 favButton.setImageResource(android.R.drawable.star_big_on);
                 chapterID = mt.getChapterID();
@@ -163,8 +173,6 @@ public class MangaInfoActivity extends AppCompatActivity {
                 favButton.setImageResource(android.R.drawable.star_big_off);
             }
         }
-
-        final int chapterNum = SharedPreferencesManager.getInstance().getValue(mangaID, Integer.class, 0);
 
         new RetrieveInfo(new AsyncTasks() {
             @Override
@@ -181,6 +189,8 @@ public class MangaInfoActivity extends AppCompatActivity {
                     mangaDetails = client.getMangaDetails(mangaID);
 
                     chapters = mangaDetails.getChapters();
+
+                    mangaTitle = mangaDetails.getTitle();
 
                     //ChapterDetails chapterDetails = client.getChapterDetails(chapters[0].getId());
                     //chapterPages = chapterDetails.getPages();
@@ -206,7 +216,7 @@ public class MangaInfoActivity extends AppCompatActivity {
                         }
                     });
 
-                } catch(NullPointerException e) {
+                } catch (NullPointerException e) {
                     e.printStackTrace();
                 }
 
@@ -215,8 +225,8 @@ public class MangaInfoActivity extends AppCompatActivity {
                 Collections.sort(chapterList, new ChapterCompare());
 
                 //Log.e("Line_"+new Throwable().getStackTrace()[0].getLineNumber(), chapterList.toString());
-                Log.e("Line_"+new Throwable().getStackTrace()[0].getLineNumber(), chapters.toString());
-                Log.e("Line_"+new Throwable().getStackTrace()[0].getLineNumber(), Arrays.deepToString(chapters));
+                Log.e("Line_" + new Throwable().getStackTrace()[0].getLineNumber(), chapters.toString());
+                Log.e("Line_" + new Throwable().getStackTrace()[0].getLineNumber(), Arrays.deepToString(chapters));
 
                 return true;
             }
@@ -237,10 +247,10 @@ public class MangaInfoActivity extends AppCompatActivity {
                 mRecyclerView.setAdapter(chapterListAdapter);
                 String titleText = mangaDetails.getTitle() + "\nTags: ";
 
-                String[] cat =  mangaDetails.getCategories();
+                String[] cat = mangaDetails.getCategories();
 
-                for(String s : cat) {
-                    titleText+=s+"\t";
+                for (String s : cat) {
+                    titleText += s + "\t";
                 }
 
                 title.setText(titleText);
@@ -258,7 +268,7 @@ public class MangaInfoActivity extends AppCompatActivity {
 
                         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
-                        if(favorited) {
+                        if (favorited) {
                             unFavorite(mangaID, user);
                         } else {
                             favorite(mangaID, mangaDetails.getTitle(), user);
@@ -269,6 +279,75 @@ public class MangaInfoActivity extends AppCompatActivity {
 
             }
         }).execute();
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.manga_info_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.share_manga) {
+            shareEmail();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    public void shareEmail() {
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("text/html");
+
+        String link = "www.mangaworld.com/me/" + mangaID;
+
+        String text = "<a href=\"" + link + "\">Check out " + mangaTitle + "</a>";
+
+        String text2 = "Visit <a href=\"http://www.google.com\">google</a> for more info.";
+
+        //intent.putExtra(Intent.EXTRA_EMAIL, "emailaddress@emailaddress.com");
+        intent.putExtra(Intent.EXTRA_SUBJECT, "Check out " + mangaTitle);
+        intent.putExtra(Intent.EXTRA_TEXT, Html.fromHtml(text + "<br>") + "\n\n" + text + "\n\n" + text2 + "\n\n" + Html.fromHtml(text2));
+
+        //startActivity(Intent.createChooser(intent, "Share " + mangaTitle));
+
+        Intent shareIntent = ShareCompat.IntentBuilder.from(this)
+                .setType("text/html")
+                .setHtmlText(text + "<br><br>" + link)
+                .setSubject("Definitely read " + mangaTitle)
+                .setChooserTitle("Share " + mangaTitle)
+                .getIntent();
+
+        startActivity(shareIntent);
+
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        handleIntent(intent);
+    }
+
+    public void handleIntent(Intent intent) {
+
+        String action = intent.getAction();
+        Uri data = intent.getData();
+
+        if(Intent.ACTION_VIEW.equals(action) && data!=null) {
+
+            String id = data.getLastPathSegment();
+
+            Help.d("action: " + action + " | data: " + data.toString() + " | id: " + id);
+
+            mangaID = id;
+
+        } else {
+            mangaID = getIntent().getStringExtra("manga_id");
+        }
 
     }
 

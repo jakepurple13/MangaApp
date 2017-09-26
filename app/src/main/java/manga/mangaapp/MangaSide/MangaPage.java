@@ -1,10 +1,13 @@
 package manga.mangaapp.MangaSide;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v4.view.PagerAdapter;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -38,6 +41,7 @@ public class MangaPage extends PagerAdapter {
         this.menuShow = menuShow;
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
 
@@ -71,7 +75,7 @@ public class MangaPage extends PagerAdapter {
                 }
             });
 
-            iv.setOnClickListener(menuShow);
+            //iv.setOnClickListener(menuShow);
 
         }
 
