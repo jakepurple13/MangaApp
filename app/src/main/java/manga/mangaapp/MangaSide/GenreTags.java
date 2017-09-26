@@ -38,7 +38,7 @@ public class GenreTags {
         }
 
         public boolean equals(Sources other) {
-            return source.equals(other.source);
+            return source.equals(other.source);// && shortcut.equals(other.shortcut);
         }
 
         public static Sources fromString(String source) {

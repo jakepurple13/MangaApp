@@ -2,6 +2,7 @@ package manga.mangaapp;
 
 import android.Manifest;
 import android.animation.Animator;
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
@@ -551,6 +552,13 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
     }
 
     public void newSource(final GenreTags.Sources tag) {
+
+        LovelyProgressDialog lpd = new LovelyProgressDialog(this);
+        lpd.setMessage("Getting Manga");
+        lpd.setMessageGravity(Gravity.CENTER);
+        lpd.setTitle("Please Wait...");
+        lpd.setTitleGravity(Gravity.CENTER);
+
         new RetrieveInfo(new AsyncTasks() {
             @Override
             public void onPreExecute() {
@@ -609,17 +617,15 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
                 if (tag.equals(GenreTags.Sources.MANGAEDEN)) {
                     getMangaEden();
                 } else {
-                    //result.removeItem(2);
-                    //List<Site> siteList = SiteHelper.getSites();
                     try {
-                        Log.e("Line_" + new Throwable().getStackTrace()[0].getLineNumber(), currentSite.getMangaList().size()+" manga titles");
+                        Help.e(currentSite.getMangaList().size()+" manga titles");
                         mangaList = new ArrayList<>();
                         mangaList.addAll(currentSite.getMangaList());
 
                         mAdapter = new Manga2Adapter(mangaList, MainActivity.this, currentSite, currentLayout);
 
-                        Log.e("Line_" + new Throwable().getStackTrace()[0].getLineNumber(), currentSite.getChapterList(mangaList.get(0)).get(0).getLink());
-                        Log.e("Line_" + new Throwable().getStackTrace()[0].getLineNumber(), mangaList.toString());
+                        Help.e(currentSite.getChapterList(mangaList.get(0)).get(0).getLink());
+                        Help.e(mangaList.toString());
 
                         chosen = false;
 
@@ -631,6 +637,7 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
                         return false;
                     }
                 }
+
                 return true;
             }
 
@@ -646,7 +653,8 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
                     SharedPreferencesManager.getInstance().putValue("manga_source", currentSource.source);
                 }
             }
-        }).execute();
+        }, lpd).execute();
+
     }
 
     @Override
