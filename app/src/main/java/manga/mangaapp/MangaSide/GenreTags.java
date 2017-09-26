@@ -8,21 +8,28 @@ public class GenreTags {
 
     public enum Sources {
 
-        MANGAEDEN("MangaEden"),
-        TAPASTIC("Tapastic"),
-        READMANGATODAY("ReadMangaToday"),
-        MANGAREADER("MangaReader"),
-        MANGAPANDA("MangaPanda"),
-        MANGAJOY("MangaJoy"),
-        MANGAHERE("MangaHere"),
-        MANGAFOX("MangaFox"),
-        LINEWEBTOON("LINEWebtoon"),
-        KISSMANGA("KissManga");
+        MANGAEDEN("MangaEden", "me"),
+        TAPASTIC("Tapastic", "ts"),
+        READMANGATODAY("ReadMangaToday", "rmt"),
+        MANGAREADER("MangaReader", "mr"),
+        MANGAPANDA("MangaPanda", "mp"),
+        MANGAJOY("MangaJoy", "mj"),
+        MANGAHERE("MangaHere", "mh"),
+        MANGAFOX("MangaFox", "mf"),
+        LINEWEBTOON("LINEWebtoon", "lw"),
+        KISSMANGA("KissManga", "km");
 
         public String source;
+        public String shortcut;
 
         Sources(String source) {
             this.source = source;
+            this.shortcut = "";
+        }
+
+        Sources(String source, String shortcut) {
+            this.source = source;
+            this.shortcut = shortcut;
         }
 
         @Override
@@ -37,6 +44,8 @@ public class GenreTags {
         public static Sources fromString(String source) {
             for (Sources b : Sources.values()) {
                 if (b.source.equalsIgnoreCase(source)) {
+                    return b;
+                } else if(b.shortcut.equalsIgnoreCase(source)) {
                     return b;
                 }
             }
@@ -162,7 +171,7 @@ public class GenreTags {
                 //Sources.KISSMANGA.source,
                 Sources.LINEWEBTOON.source,
                 Sources.MANGAEDEN.source,
-                Sources.MANGAFOX.source,
+                //Sources.MANGAFOX.source,
                 Sources.MANGAHERE.source,
                 //Sources.MANGAJOY.source,
                 Sources.MANGAPANDA.source,

@@ -4,16 +4,23 @@ package manga.mangaapp.MangaSide;
  * Created by Jacob on 9/14/17.
  */
 
+import android.content.Intent;
 import android.icu.math.BigDecimal;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.v4.app.ShareCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -84,10 +91,20 @@ public class MangaSiteInfoActivity extends AppCompatActivity {
 
     String summary = "";
 
+    String mangaTitle;
+    String mangaLink;
+
+    Manga m;
+
+    String source;
+    GenreTags.Sources finalTags;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_manga_info);
+
+        handleIntent(getIntent());
 
         imageView = findViewById(R.id.manga_cover);
 
@@ -101,27 +118,6 @@ public class MangaSiteInfoActivity extends AppCompatActivity {
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.addItemDecoration(new DividerItemDecoration(this,DividerItemDecoration.VERTICAL ));
 
-        final String mangaLink = getIntent().getStringExtra("manga_link");
-        final String mangaTitle = getIntent().getStringExtra("manga_title");
-
-        final Manga m = new Manga(mangaLink, mangaTitle);
-
-        String source = "";
-        GenreTags.Sources tags = null;
-        try {
-
-            source = getIntent().getStringExtra("manga_source");
-            Help.e(source);
-            tags = GenreTags.Sources.fromString(source.replaceAll(" ", ""));
-            Help.e(tags.source);
-            Help.e(SiteHelper.getEnglishSiteFromString(tags).getName());
-
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
-
-
-        final GenreTags.Sources finalTags = tags;
         final String finalSource = source;
         new RetrieveInfo(new AsyncTasks() {
             @Override
@@ -214,6 +210,118 @@ public class MangaSiteInfoActivity extends AppCompatActivity {
         }).execute();
 
 
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.manga_info_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.share_manga) {
+            shareEmail();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    public void shareEmail() {
+
+        String links = mangaLink;//link.getText().toString();
+
+        String text = "<a href=\"" + links + "\">Check out " + m.getTitle() + "</a>";
+
+        String thisApp = "Or check it out in MangaWorld at http://www.mangaworld.com/" + finalTags.shortcut + "/" + m.getTitle().replaceAll(" ", "-");
+
+        //startActivity(Intent.createChooser(intent, "Share " + mangaTitle));
+
+        Intent shareIntent = ShareCompat.IntentBuilder.from(this)
+                .setType("text/html")
+                .setHtmlText(text + "<br><br>" + links + "<br><br>" + thisApp)
+                .setSubject("Definitely read " + mangaTitle)
+                .setChooserTitle("Share " + mangaTitle)
+                .getIntent();
+
+        startActivity(shareIntent);
+
+    }
+
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        handleIntent(intent);
+    }
+
+    public void handleIntent(Intent intent) {
+
+        String action = intent.getAction();
+        Uri data = intent.getData();
+
+        if(Intent.ACTION_VIEW.equals(action) && data!=null) {
+
+            String id = data.getLastPathSegment();
+
+            String sourceId = data.getPathSegments().get(0);
+            String titleId = data.getPathSegments().get(1);
+
+            for(String s : data.getPathSegments()) {
+                Help.e(s);
+            }
+
+            GenreTags.Sources tags = null;
+            source = sourceId;
+
+            tags = GenreTags.Sources.fromString(source);
+
+            finalTags = tags;
+
+            s = SiteHelper.getEnglishSiteFromString(finalTags);
+
+            mangaLink = "/" + titleId.replaceAll("_", "-").toLowerCase();
+            mangaTitle = titleId.replaceAll("-", " ");
+
+            if(tags.equals(GenreTags.Sources.READMANGATODAY)) {
+                mangaLink = s.getUrl() + mangaLink;
+            }
+
+            m = new Manga(mangaLink, mangaTitle);
+
+            Help.d("action: " + action + " | data: " + data.toString() + " | id: " + id);
+
+            Help.i(mangaLink);
+
+            Help.i(s.getUrl() + m.getLink());
+
+        } else {
+            //mangaID = getIntent().getStringExtra("manga_id");
+            mangaLink = getIntent().getStringExtra("manga_link");
+            mangaTitle = getIntent().getStringExtra("manga_title");
+            m = new Manga(mangaLink, mangaTitle);
+
+            GenreTags.Sources tags = null;
+            source = "";
+            try {
+
+                source = getIntent().getStringExtra("manga_source");
+                Help.e(source);
+                tags = GenreTags.Sources.fromString(source.replaceAll(" ", ""));
+                Help.e(tags.source);
+                Help.e(SiteHelper.getEnglishSiteFromString(tags).getName());
+
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
+
+
+            finalTags = tags;
+
+        }
 
     }
 

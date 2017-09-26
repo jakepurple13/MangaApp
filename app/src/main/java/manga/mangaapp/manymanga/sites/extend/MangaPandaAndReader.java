@@ -24,8 +24,7 @@ public class MangaPandaAndReader implements Site {
     private final List<String> language;
     private final Boolean watermarks;
 
-    public MangaPandaAndReader(String name, String url, List<String> language,
-            Boolean watermarks) {
+    public MangaPandaAndReader(String name, String url, List<String> language, Boolean watermarks) {
         this.name = name;
         this.url = url;
         this.language = language;

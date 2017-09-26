@@ -35,7 +35,48 @@
 
         </activity>
 
-        <activity android:name=".MangaSide.MangaSiteInfoActivity" />
+        <activity android:name=".MangaSide.MangaSiteInfoActivity">
+
+            <intent-filter android:autoVerify="true">
+
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <!--MangaReader-->
+                <data android:scheme="http" android:host="www.mangaworld.com" android:pathPrefix="/mr" />
+                <data android:scheme="https" android:host="mobile.mangaworld.com" android:pathPrefix="/mr" />
+                <!--MangaPanda-->
+                <data android:scheme="http" android:host="www.mangaworld.com" android:pathPrefix="/mp" />
+                <data android:scheme="https" android:host="mobile.mangaworld.com" android:pathPrefix="/mp" />
+                <!--LINEWebtoon-->
+                <data android:scheme="http" android:host="www.mangaworld.com" android:pathPrefix="/lw" />
+                <data android:scheme="https" android:host="mobile.mangaworld.com" android:pathPrefix="/lw" />
+                <!--MangaFox-->
+                <data android:scheme="http" android:host="www.mangaworld.com" android:pathPrefix="/mf" />
+                <data android:scheme="https" android:host="mobile.mangaworld.com" android:pathPrefix="/mf" />
+                <!--MangaHere-->
+                <data android:scheme="http" android:host="www.mangaworld.com" android:pathPrefix="/mh" />
+                <data android:scheme="https" android:host="mobile.mangaworld.com" android:pathPrefix="/mh" />
+                <!--ReadMangaToday-->
+                <data android:scheme="http" android:host="www.mangaworld.com" android:pathPrefix="/rmt" />
+                <data android:scheme="https" android:host="mobile.mangaworld.com" android:pathPrefix="/rmt" />
+
+
+            </intent-filter>
+<!--
+
+            <intent-filter android:autoVerify="true">
+                &lt;!&ndash;MangaPanda&ndash;&gt;
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="http" android:host="www.mangaworld.com" android:pathPrefix="/mp" />
+                <data android:scheme="https" android:host="mobile.mangaworld.com" android:pathPrefix="/mp" />
+
+            </intent-filter>
+-->
+
+        </activity>
         <activity
             android:name=".MangaSide.ReadManga"
             android:theme="@style/Base.Theme.AppCompat.NoBar" />
