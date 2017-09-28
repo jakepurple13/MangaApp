@@ -32,6 +32,7 @@ import manga.mangaapp.RetrieveInfo;
 import manga.mangaapp.mangaedenclient.Chapter;
 import manga.mangaapp.mangaedenclient.ChapterPage;
 import manga.mangaapp.mangaedenclient.MangaEdenClient;
+import manga.mangaapp.manymanga.data.Image;
 
 /**
  * Created by Jacob on 8/23/17.
@@ -47,6 +48,8 @@ public class ChapterListAdapter extends RecyclerView.Adapter<ChapterListAdapter.
     String currentChapter;
     String mangaTitle;
     MangaEdenClient client;
+
+    ChapterPage[] images;
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -142,6 +145,8 @@ public class ChapterListAdapter extends RecyclerView.Adapter<ChapterListAdapter.
                 lpd.setTitle("Please Wait...");
                 lpd.setTitleGravity(Gravity.CENTER);
 
+
+
                 new RetrieveInfo(new AsyncTasks() {
                     @Override
                     public void onPreExecute() {
@@ -151,8 +156,11 @@ public class ChapterListAdapter extends RecyclerView.Adapter<ChapterListAdapter.
                     @Override
                     public boolean doInBackground() {
 
+
+
                         try {
-                            AppUtil.downloadChapter(in, client.getChapterDetails(mDataset[position].getId()).getPages(), mangaTitle, mDataset[position].getNumber());
+                            images = client.getChapterDetails(mDataset[position].getId()).getPages();
+                            //AppUtil.downloadChapter(in, , mangaTitle, mDataset[position].getNumber());
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -163,8 +171,10 @@ public class ChapterListAdapter extends RecyclerView.Adapter<ChapterListAdapter.
                     @Override
                     public void onPostExecute(Boolean success) {
 
+                        AppUtil.downloadChapter(in, images, mangaTitle, mDataset[position].getNumber(), true);
+
                     }
-                }, lpd).execute();
+                }).execute();
 
             }
         });
