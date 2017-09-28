@@ -7,13 +7,17 @@ package manga.mangaapp.MangaSide;
 import android.app.Activity;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import manga.mangaapp.AppUtil;
+import manga.mangaapp.AsyncTasks;
 import manga.mangaapp.R;
 
 import android.app.Activity;
@@ -30,13 +34,17 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
+import com.yarolegovich.lovelydialog.LovelyProgressDialog;
 
+import java.io.IOException;
 import java.util.List;
 
 import manga.mangaapp.MainActivity;
 import manga.mangaapp.R;
+import manga.mangaapp.RetrieveInfo;
 import manga.mangaapp.manymanga.data.Chapter;
 import manga.mangaapp.manymanga.data.Manga;
+import manga.mangaapp.manymanga.sites.Site;
 
 /**
  * Created by Jacob on 8/23/17.
@@ -50,6 +58,7 @@ public class SiteChapterListAdapter extends RecyclerView.Adapter<SiteChapterList
     Activity in;
     Manga m;
     String source;
+    Site s;
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -60,12 +69,14 @@ public class SiteChapterListAdapter extends RecyclerView.Adapter<SiteChapterList
         public TextView mTextView;
         public ImageView imageView;
         public RelativeLayout relativeLayout;
+        public ImageButton downloadChapter;
 
         public ViewHolder(View v) {
             super(v);
             mTextView = (TextView) v.findViewById(R.id.name);
             imageView = v.findViewById(R.id.imageButton);
             relativeLayout = v.findViewById(R.id.manga_layout);
+            downloadChapter = v.findViewById(R.id.download_chapter);
         }
     }
 
@@ -75,11 +86,12 @@ public class SiteChapterListAdapter extends RecyclerView.Adapter<SiteChapterList
         mDataset = myDataset;
         this.in = in;
     }*/
-    public SiteChapterListAdapter(List<Chapter> myDataset, Activity in, Manga manga, String source) {
+    public SiteChapterListAdapter(List<Chapter> myDataset, Activity in, Manga manga, String source, Site s) {
         mDataset = myDataset;
         this.in = in;
         m = manga;
         this.source = source;
+        this.s = s;
     }
 
     // Create new views (invoked by the layout manager)
@@ -123,6 +135,44 @@ public class SiteChapterListAdapter extends RecyclerView.Adapter<SiteChapterList
         tv.setOnClickListener(onClickListener);
 
         layout.setOnClickListener(onClickListener);
+
+        ImageButton downloadChapter = holder.downloadChapter;
+        downloadChapter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                LovelyProgressDialog lpd = new LovelyProgressDialog(in);
+                lpd.setMessage("Getting Manga");
+                lpd.setMessageGravity(Gravity.CENTER);
+                lpd.setTitle("Please Wait...");
+                lpd.setTitleGravity(Gravity.CENTER);
+
+                new RetrieveInfo(new AsyncTasks() {
+                    @Override
+                    public void onPreExecute() {
+
+                    }
+
+                    @Override
+                    public boolean doInBackground() {
+
+                        try {
+                            AppUtil.downloadChapter(in, s.getChapterImageLinks(mDataset.get(position)), m.getTitle(), mDataset.size()-position);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                        return false;
+                    }
+
+                    @Override
+                    public void onPostExecute(Boolean success) {
+
+                    }
+                }, lpd).execute();
+
+            }
+        });
 
     }
 

@@ -77,6 +77,7 @@ public class RetrieveInfo extends AsyncTask<String, Integer, Boolean> {
             protected Boolean doInBackground(Integer... integers) {
 
                 for(int i=0;i<1000;i++) {
+                Thread.sleep(50);
                     per++;
                     publishProgress(per);
                     if(isCancelled()) {

@@ -3,6 +3,9 @@
     package="manga.mangaapp">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.USE_FINGERPRINT" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 
     <application
         android:name=".StoryWorld"
@@ -14,6 +17,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".MainActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -21,7 +25,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MangaSide.MangaInfoActivity">
+        <activity android:name=".MangaSide.MangaInfoActivity"
+            android:screenOrientation="portrait">
 
             <intent-filter android:autoVerify="true">
 
@@ -35,7 +40,8 @@
 
         </activity>
 
-        <activity android:name=".MangaSide.MangaSiteInfoActivity">
+        <activity android:name=".MangaSide.MangaSiteInfoActivity"
+            android:screenOrientation="portrait">
 
             <intent-filter android:autoVerify="true">
 
@@ -79,9 +85,11 @@
         </activity>
         <activity
             android:name=".MangaSide.ReadManga"
+            android:screenOrientation="portrait"
             android:theme="@style/Base.Theme.AppCompat.NoBar" />
         <activity
             android:name=".MangaSide.ReadMangaSite"
+            android:screenOrientation="portrait"
             android:theme="@style/Base.Theme.AppCompat.NoBar" />
         <!--<activity android:name=".UserInfo.Favorites" />-->
         <activity android:name=".MainHub" />

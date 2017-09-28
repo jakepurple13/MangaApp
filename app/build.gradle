@@ -52,6 +52,8 @@ dependencies {
         transitive = true
     }
 
+    compile 'com.mtramin:rxfingerprint:2.1.0'
+
     compile 'org.adw.library:discrete-seekbar:1.0.1'
     compile 'com.bogdwellers:pinchtozoom:0.1'
 

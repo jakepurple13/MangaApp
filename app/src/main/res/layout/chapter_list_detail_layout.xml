@@ -11,8 +11,9 @@
         android:id="@+id/name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="TextView"
-        android:layout_below="@+id/imageButton" />
+        android:layout_below="@+id/imageButton"
+        android:layout_toStartOf="@+id/download_chapter"
+        android:text="TextView" />
 
     <ImageView
         android:id="@+id/imageButton"
@@ -21,5 +22,13 @@
         app:srcCompat="@mipmap/ic_launcher"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true" />
+
+    <ImageButton
+        android:id="@+id/download_chapter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignTop="@+id/name"
+        app:srcCompat="@android:drawable/arrow_down_float" />
 
 </RelativeLayout>

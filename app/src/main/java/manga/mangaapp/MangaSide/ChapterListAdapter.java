@@ -6,9 +6,11 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v7.widget.RecyclerView;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -17,13 +19,19 @@ import com.karumi.marvelapiclient.model.ComicDto;
 import com.karumi.marvelapiclient.model.MarvelImage;
 import com.kingfisher.easy_sharedpreference_library.SharedPreferencesManager;
 import com.squareup.picasso.Picasso;
+import com.yarolegovich.lovelydialog.LovelyProgressDialog;
 
+import java.io.IOException;
 import java.util.List;
 
+import manga.mangaapp.AppUtil;
+import manga.mangaapp.AsyncTasks;
 import manga.mangaapp.MainActivity;
 import manga.mangaapp.R;
+import manga.mangaapp.RetrieveInfo;
 import manga.mangaapp.mangaedenclient.Chapter;
 import manga.mangaapp.mangaedenclient.ChapterPage;
+import manga.mangaapp.mangaedenclient.MangaEdenClient;
 
 /**
  * Created by Jacob on 8/23/17.
@@ -38,6 +46,7 @@ public class ChapterListAdapter extends RecyclerView.Adapter<ChapterListAdapter.
     String mangaID;
     String currentChapter;
     String mangaTitle;
+    MangaEdenClient client;
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -48,12 +57,14 @@ public class ChapterListAdapter extends RecyclerView.Adapter<ChapterListAdapter.
         public TextView mTextView;
         public ImageView imageView;
         public RelativeLayout relativeLayout;
+        public ImageButton downloadChapter;
 
         public ViewHolder(View v) {
             super(v);
             mTextView = (TextView) v.findViewById(R.id.name);
             imageView = v.findViewById(R.id.imageButton);
             relativeLayout = v.findViewById(R.id.manga_layout);
+            downloadChapter = v.findViewById(R.id.download_chapter);
         }
     }
 
@@ -63,12 +74,13 @@ public class ChapterListAdapter extends RecyclerView.Adapter<ChapterListAdapter.
         mDataset = myDataset;
         this.in = in;
     }*/
-    public ChapterListAdapter(Chapter[] myDataset, Activity in, String mangaID, String currentChapter, String title) {
+    public ChapterListAdapter(Chapter[] myDataset, Activity in, String mangaID, String currentChapter, String title, MangaEdenClient client) {
         mDataset = myDataset;
         this.in = in;
         this.mangaID = mangaID;
         this.currentChapter = currentChapter;
         this.mangaTitle = title;
+        this.client = client;
     }
 
     // Create new views (invoked by the layout manager)
@@ -118,6 +130,44 @@ public class ChapterListAdapter extends RecyclerView.Adapter<ChapterListAdapter.
         tv.setOnClickListener(onClickListener);
 
         layout.setOnClickListener(onClickListener);
+
+        ImageButton downloadChapter = holder.downloadChapter;
+        downloadChapter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                LovelyProgressDialog lpd = new LovelyProgressDialog(in);
+                lpd.setMessage("Getting Manga");
+                lpd.setMessageGravity(Gravity.CENTER);
+                lpd.setTitle("Please Wait...");
+                lpd.setTitleGravity(Gravity.CENTER);
+
+                new RetrieveInfo(new AsyncTasks() {
+                    @Override
+                    public void onPreExecute() {
+
+                    }
+
+                    @Override
+                    public boolean doInBackground() {
+
+                        try {
+                            AppUtil.downloadChapter(in, client.getChapterDetails(mDataset[position].getId()).getPages(), mangaTitle, mDataset[position].getNumber());
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+                        return false;
+                    }
+
+                    @Override
+                    public void onPostExecute(Boolean success) {
+
+                    }
+                }, lpd).execute();
+
+            }
+        });
 
     }
 

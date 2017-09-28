@@ -57,9 +57,12 @@ import com.forcelain.awesomelayoutmanager.AwesomeLayoutManager;
 import com.gdacciaro.iOSDialog.iOSDialog;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.FirebaseException;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.PhoneAuthCredential;
+import com.google.firebase.auth.PhoneAuthProvider;
 import com.greenfrvr.hashtagview.HashtagView;
 import com.karumi.marvelapiclient.ComicApiClient;
 import com.karumi.marvelapiclient.MarvelApiConfig;
@@ -88,6 +91,8 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.mikepenz.materialdrawer.util.AbstractDrawerImageLoader;
 import com.mikepenz.materialdrawer.util.DrawerImageLoader;
+import com.mtramin.rxfingerprint.RxFingerprint;
+import com.mtramin.rxfingerprint.data.FingerprintAuthenticationResult;
 import com.squareup.picasso.Picasso;
 import com.yarolegovich.lovelydialog.LovelyCustomDialog;
 import com.yarolegovich.lovelydialog.LovelyProgressDialog;
@@ -111,6 +116,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Executor;
+import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -118,6 +124,8 @@ import co.hkm.soltag.LayouMode;
 import co.hkm.soltag.TagContainerLayout;
 import co.hkm.soltag.TagView;
 import info.guardianproject.netcipher.NetCipher;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
 import jp.wasabeef.recyclerview.adapters.SlideInLeftAnimationAdapter;
 import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
 import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
@@ -687,6 +695,35 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
             // FirebaseUser.getToken() instead.
             String uid = user.getUid();
         }*/
+
+        /*
+
+        if (RxFingerprint.isAvailable(this)) {
+            // proceed with fingerprint operation
+            // need to display something for the user
+            Disposable disposable = RxFingerprint.authenticate(this)
+                    .subscribe(new Consumer<FingerprintAuthenticationResult>() {
+                        @Override
+                        public void accept(FingerprintAuthenticationResult fingerprintAuthenticationResult) throws Exception {
+                            switch (fingerprintAuthenticationResult.getResult()) {
+                                case FAILED:
+                                    Help.e("Fingerprint not recognized, try again!");
+                                    break;
+                                case HELP:
+                                    Help.i(fingerprintAuthenticationResult.getMessage());
+                                    break;
+                                case AUTHENTICATED:
+                                    Help.d("Successfully authenticated!");
+                                    break;
+                            }
+                        }
+                    });
+
+        } else {
+            // fingerprint is not available
+        }
+
+        */
 
     }
 

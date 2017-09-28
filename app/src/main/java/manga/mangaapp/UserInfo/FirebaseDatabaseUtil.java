@@ -27,6 +27,7 @@ import in.cubestack.android.lib.storm.criteria.StormRestrictions;
 import in.cubestack.android.lib.storm.service.BaseService;
 import in.cubestack.android.lib.storm.service.StormService;
 import manga.mangaapp.Help;
+import manga.mangaapp.MangaSide.GenreTags;
 import manga.mangaapp.MangaSide.MangaInfoActivity;
 
 /**
@@ -53,10 +54,37 @@ public class FirebaseDatabaseUtil {
         Map<String, Object> postValues = post.toMap();
 
         Map<String, Object> childUpdates = new HashMap<>();
-        childUpdates.put("/posts/" + key, postValues);
+        //childUpdates.put("/posts/" + key, postValues);
         childUpdates.put("/user-posts/" + userId + "/" + /*key + "/" +*/ mangaID, postValues);
 
         mDatabase.getReference().updateChildren(childUpdates);
+    }
+
+    public static void writeNewPost(String mangaID, String chapterID, String title, GenreTags.Sources source) {
+        // Create new post at /user-posts/$userid/$postid and at
+        // /posts/$postid simultaneously
+        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        String key = mDatabase.getReference().child("posts").push().getKey();
+        UserInfo post = new UserInfo(userId, mangaID, chapterID, title);
+        Map<String, Object> postValues = post.toMap();
+
+        Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put("/posts/" + key, postValues);
+        childUpdates.put("/user-posts/" + userId + "/" + source.shortcut + "/" + mangaID, postValues);
+
+        mDatabase.getReference().updateChildren(childUpdates);
+    }
+
+    public static void getListOfData(ValueEventListener valueEventListener, GenreTags.Sources source) {
+
+        String myUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        Query myTopPostsQuery = FirebaseDatabase.getInstance().getReference().child("user-posts").child(myUserId).child(source.shortcut);
+
+        // My top posts by number of stars
+        //myTopPostsQuery.addValueEventListener(valueEventListener);
+
+        myTopPostsQuery.addListenerForSingleValueEvent(valueEventListener);
     }
 
     public static void getListOfData(ValueEventListener valueEventListener) {

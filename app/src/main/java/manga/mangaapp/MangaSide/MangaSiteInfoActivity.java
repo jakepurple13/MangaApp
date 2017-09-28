@@ -202,7 +202,7 @@ public class MangaSiteInfoActivity extends AppCompatActivity {
                     }
                 });
 
-                chapterListAdapter = new SiteChapterListAdapter(chapterList, MangaSiteInfoActivity.this, m, finalSource);
+                chapterListAdapter = new SiteChapterListAdapter(chapterList, MangaSiteInfoActivity.this, m, finalSource, s);
                 mRecyclerView.setAdapter(chapterListAdapter);
                 title.setText(m.getTitle());
                 description.setText(summary);

@@ -12,6 +12,7 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
+import android.text.util.Linkify;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -48,6 +49,7 @@ import java.util.Map;
 
 import in.cubestack.android.lib.storm.service.BaseService;
 import in.cubestack.android.lib.storm.service.StormService;
+import manga.mangaapp.AppUtil;
 import manga.mangaapp.AsyncTasks;
 import manga.mangaapp.Help;
 import manga.mangaapp.R;
@@ -243,7 +245,7 @@ public class MangaInfoActivity extends AppCompatActivity {
                     }
                 });
 
-                chapterListAdapter = new ChapterListAdapter(chapters, MangaInfoActivity.this, mangaID, chapterID, mangaDetails.getTitle());
+                chapterListAdapter = new ChapterListAdapter(chapters, MangaInfoActivity.this, mangaID, chapterID, mangaDetails.getTitle(), client);
                 mRecyclerView.setAdapter(chapterListAdapter);
                 String titleText = mangaDetails.getTitle() + "\nTags: ";
 
@@ -256,6 +258,7 @@ public class MangaInfoActivity extends AppCompatActivity {
                 title.setText(titleText);
                 description.setText(mangaDetails.getDescription());
                 link.setText(mangaDetails.getURI().toString());
+                Linkify.addLinks(link, Linkify.WEB_URLS);
                 link.setLinksClickable(true);
 
                 setTitle(mangaDetails.getTitle());

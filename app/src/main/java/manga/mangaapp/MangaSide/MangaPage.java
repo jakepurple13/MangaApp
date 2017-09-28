@@ -61,7 +61,9 @@ public class MangaPage extends PagerAdapter {
             view = LayoutInflater.from(activity).inflate(R.layout.manga_page_layout, container, false);
 
             final ImageView iv = view.findViewById(R.id.manga_page);
-            iv.setOnTouchListener(new ImageMatrixTouchHandler(view.getContext()));
+
+            ImageMatrixTouchHandler im = new ImageMatrixTouchHandler(view.getContext());
+            iv.setOnTouchListener(im);
 
             final URI imageUrl = pages[position].getImageURI();
             Handler uiHandler = new Handler(Looper.getMainLooper());

@@ -120,16 +120,12 @@ public class ReadManga extends AppCompatActivity {
             public void onMainViewAppeared(FABRevealLayout fabRevealLayout, View mainView) {
                 revealLayout.findViewById(R.id.show_and_hide).animate().alpha(0.5f);
                 //revealLayout.findViewById(R.id.show_and_hide).animate().alpha(0f);
-                isMenuShowing = false;
-                getSupportActionBar().hide();
-                h.removeCallbacks(hideMenu); // cancel the running action (the hiding process)
+                hide();
             }
 
             @Override
             public void onSecondaryViewAppeared(final FABRevealLayout fabRevealLayout, View secondaryView) {
-                isMenuShowing = true;
-                getSupportActionBar().show();
-                h.postDelayed(hideMenu, DELAY_AMOUNT); // start a new hiding process that will trigger after 5 seconds
+                show();
             }
         });
 
@@ -143,18 +139,18 @@ public class ReadManga extends AppCompatActivity {
             public void onProgressChanged(DiscreteSeekBar seekBar, int value, boolean fromUser) {
                 viewPager.setCurrentItem(value);
                 pageCount.setText((value+1)+"/"+pages.length);
-                h.removeCallbacks(hideMenu); // cancel the running action (the hiding process)
-                h.postDelayed(hideMenu, DELAY_AMOUNT); // start a new hiding process that will trigger after 5 seconds
+                //h.removeCallbacks(hideMenu); // cancel the running action (the hiding process)
+                //h.postDelayed(hideMenu, DELAY_AMOUNT); // start a new hiding process that will trigger after 5 seconds
             }
 
             @Override
             public void onStartTrackingTouch(DiscreteSeekBar seekBar) {
-
+                h.removeCallbacks(hideMenu); // cancel the running action (the hiding process)
             }
 
             @Override
             public void onStopTrackingTouch(DiscreteSeekBar seekBar) {
-
+                h.postDelayed(hideMenu, DELAY_AMOUNT);
             }
         });
 
@@ -327,4 +323,17 @@ public class ReadManga extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+    public void hide() {
+        isMenuShowing = false;
+        getSupportActionBar().hide();
+        h.removeCallbacks(hideMenu); // cancel the running action (the hiding process)
+    }
+
+    public void show() {
+        isMenuShowing = true;
+        getSupportActionBar().show();
+        h.postDelayed(hideMenu, DELAY_AMOUNT); // start a new hiding process that will trigger after 5 seconds
+    }
+
 }
