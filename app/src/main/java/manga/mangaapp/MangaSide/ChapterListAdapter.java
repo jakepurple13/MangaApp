@@ -2,6 +2,7 @@ package manga.mangaapp.MangaSide;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
@@ -51,6 +52,8 @@ public class ChapterListAdapter extends RecyclerView.Adapter<ChapterListAdapter.
 
     ChapterPage[] images;
 
+    int textColor;
+
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
     // you provide access to all the views for a data item in a view holder
@@ -84,6 +87,17 @@ public class ChapterListAdapter extends RecyclerView.Adapter<ChapterListAdapter.
         this.currentChapter = currentChapter;
         this.mangaTitle = title;
         this.client = client;
+        this.textColor = in.getResources().getColor(R.color.md_black_1000);
+    }
+
+    public ChapterListAdapter(Chapter[] myDataset, Activity in, String mangaID, String currentChapter, String title, MangaEdenClient client, int textColor) {
+        mDataset = myDataset;
+        this.in = in;
+        this.mangaID = mangaID;
+        this.currentChapter = currentChapter;
+        this.mangaTitle = title;
+        this.client = client;
+        this.textColor = textColor;
     }
 
     // Create new views (invoked by the layout manager)
@@ -103,6 +117,7 @@ public class ChapterListAdapter extends RecyclerView.Adapter<ChapterListAdapter.
     public void onBindViewHolder(ChapterListAdapter.ViewHolder holder, final int position) {
 
         TextView tv = holder.mTextView;
+        tv.setTextColor(textColor);
         ImageView ib = holder.imageView;
         ib.setVisibility(View.GONE);
         String title = mDataset[position].getTitle()!=null ? mDataset[position].getTitle() : "";

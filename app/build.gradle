@@ -41,9 +41,9 @@ android {
 }
 dependencies {
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
-    implementation 'com.google.firebase:firebase-auth:11.0.4'
-    implementation 'com.google.firebase:firebase-database:11.0.4'
-    implementation 'com.google.firebase:firebase-crash:11.0.4'
+    implementation 'com.google.firebase:firebase-auth:11.4.0'
+    implementation 'com.google.firebase:firebase-database:11.4.0'
+    implementation 'com.google.firebase:firebase-crash:11.4.0'
     compile fileTree(dir: 'libs', include: ['*.jar'])
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
@@ -52,7 +52,13 @@ dependencies {
         transitive = true
     }
 
+    //compile 'com.github.jakepurple13:HelperUtils2:v0.4'
+
     compile 'com.mtramin:rxfingerprint:2.1.0'
+
+    compile 'com.android.support:palette-v7:26.1.0'
+
+    //compile 'com.github.dimorinny:show-case-card-view:0.0.3'
 
     compile 'org.adw.library:discrete-seekbar:1.0.1'
     compile 'com.bogdwellers:pinchtozoom:0.1'

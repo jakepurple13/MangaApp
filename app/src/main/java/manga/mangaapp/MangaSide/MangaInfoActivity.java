@@ -1,6 +1,10 @@
 package manga.mangaapp.MangaSide;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
@@ -8,6 +12,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ShareCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.graphics.Palette;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -18,8 +23,11 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -32,6 +40,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.kingfisher.easy_sharedpreference_library.SharedPreferencesManager;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import com.tapadoo.alerter.Alerter;
 
@@ -39,6 +48,8 @@ import junit.framework.Assert;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -96,6 +107,10 @@ public class MangaInfoActivity extends AppCompatActivity {
 
     String mangaTitle;
 
+    Palette p = null;
+
+    RelativeLayout rl;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -104,6 +119,8 @@ public class MangaInfoActivity extends AppCompatActivity {
         handleIntent(getIntent());
 
         imageView = findViewById(R.id.manga_cover);
+
+        rl = findViewById(R.id.manga_info_layout);
 
         favButton = findViewById(R.id.fav_button);
 
@@ -218,8 +235,19 @@ public class MangaInfoActivity extends AppCompatActivity {
                         }
                     });
 
+                    try {
+                        URL url_value = new URL(String.valueOf(imageUrl));
+                        Bitmap mIcon1 = BitmapFactory.decodeStream(url_value.openConnection().getInputStream());
+                        p = Palette.from(mIcon1).generate();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        Help.w("Didn't get it!");
+                        p = null;
+                    }
+
                 } catch (NullPointerException e) {
                     e.printStackTrace();
+                    p = null;
                 }
 
                 chapterList = Arrays.asList(mangaDetails.getChapters());
@@ -229,6 +257,7 @@ public class MangaInfoActivity extends AppCompatActivity {
                 //Log.e("Line_"+new Throwable().getStackTrace()[0].getLineNumber(), chapterList.toString());
                 Log.e("Line_" + new Throwable().getStackTrace()[0].getLineNumber(), chapters.toString());
                 Log.e("Line_" + new Throwable().getStackTrace()[0].getLineNumber(), Arrays.deepToString(chapters));
+
 
                 return true;
             }
@@ -245,7 +274,43 @@ public class MangaInfoActivity extends AppCompatActivity {
                     }
                 });
 
-                chapterListAdapter = new ChapterListAdapter(chapters, MangaInfoActivity.this, mangaID, chapterID, mangaDetails.getTitle(), client);
+                //if(p!=null) {
+                if(mangaDetails.getImage()!=null) {
+
+                    int vibrantColor = p.getLightVibrantColor(getColor(R.color.white));
+                    int darkVibrant = p.getDarkVibrantColor(getColor(R.color.md_black_1000));
+
+                    //MangaInfoActivity.this.getActionBar().setBackgroundDrawable(new ColorDrawable(vibrantColor));
+
+                    getSupportActionBar().setBackgroundDrawable(new ColorDrawable(vibrantColor));
+
+                    String hex = "#"+Integer.toHexString(darkVibrant).substring(2);
+
+                    getSupportActionBar().setTitle(Html.fromHtml("<font color='"+hex+"'>"+mangaDetails.getTitle()+"</font>"));
+
+                    rl.setBackgroundColor(vibrantColor);
+                    mRecyclerView.setBackgroundColor(vibrantColor);
+                    //imageView.setBackgroundColor(vibrantColor);
+                    title.setBackgroundColor(vibrantColor);
+                    description.setBackgroundColor(vibrantColor);
+
+                    Help.d(darkVibrant + " color and " + hex);
+
+                    link.setBackgroundColor(vibrantColor);
+                    title.setTextColor(darkVibrant);
+                    description.setTextColor(darkVibrant);
+                    link.setLinkTextColor(darkVibrant);
+
+                    Window window = getWindow();
+                    window.setStatusBarColor(darkVibrant);
+
+                    chapterListAdapter = new ChapterListAdapter(chapters, MangaInfoActivity.this, mangaID, chapterID, mangaDetails.getTitle(), client, darkVibrant);
+
+                } else {
+                    chapterListAdapter = new ChapterListAdapter(chapters, MangaInfoActivity.this, mangaID, chapterID, mangaDetails.getTitle(), client);
+                    setTitle(mangaDetails.getTitle());
+                }
+
                 mRecyclerView.setAdapter(chapterListAdapter);
                 String titleText = mangaDetails.getTitle() + "\nTags: ";
 
@@ -260,8 +325,6 @@ public class MangaInfoActivity extends AppCompatActivity {
                 link.setText(mangaDetails.getURI().toString());
                 Linkify.addLinks(link, Linkify.WEB_URLS);
                 link.setLinksClickable(true);
-
-                setTitle(mangaDetails.getTitle());
 
                 favButton.setOnClickListener(new View.OnClickListener() {
                     @Override

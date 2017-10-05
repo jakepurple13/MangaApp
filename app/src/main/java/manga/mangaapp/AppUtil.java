@@ -1,5 +1,6 @@
 package manga.mangaapp;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -62,8 +63,9 @@ public class AppUtil {
         lpd.setMessageGravity(Gravity.CENTER);
         lpd.setTitle("Please Wait...");
         lpd.setTitleGravity(Gravity.CENTER);
+        lpd.setIcon(R.drawable.ic_menu_black_24dp);
 
-        AsyncTask<Void, Integer, Boolean> task = new AsyncTask<Void, Integer, Boolean>() {
+        @SuppressLint("StaticFieldLeak") AsyncTask<Void, Integer, Boolean> task = new AsyncTask<Void, Integer, Boolean>() {
 
             @Override
             protected void onPreExecute() {
@@ -114,15 +116,14 @@ public class AppUtil {
 
     public static void downloadChapter(final Context context, final List<Image> chapters, final String title, final int chapterNum, boolean b) {
 
-
-
         final LovelyProgressDialog lpd = new LovelyProgressDialog(context);
         lpd.setMessage("Getting Manga");
         lpd.setMessageGravity(Gravity.CENTER);
         lpd.setTitle("Please Wait...");
         lpd.setTitleGravity(Gravity.CENTER);
+        lpd.setIcon(R.drawable.ic_menu_black_24dp);
 
-        AsyncTask<Void, Integer, Boolean> task = new AsyncTask<Void, Integer, Boolean>() {
+        @SuppressLint("StaticFieldLeak") AsyncTask<Void, Integer, Boolean> task = new AsyncTask<Void, Integer, Boolean>() {
 
             @Override
             protected void onPreExecute() {

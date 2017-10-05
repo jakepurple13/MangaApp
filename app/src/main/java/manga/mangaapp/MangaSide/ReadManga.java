@@ -205,6 +205,9 @@ public class ReadManga extends AppCompatActivity {
                                 Help.e(Arrays.toString(pages));
                             } catch (IOException e) {
                                 e.printStackTrace();
+                            } catch (ArrayIndexOutOfBoundsException e) {
+                                e.printStackTrace();
+                                ReadManga.this.finish();
                             }
                             return true;
                         }

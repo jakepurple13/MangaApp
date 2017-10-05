@@ -2,12 +2,15 @@ package manga.mangaapp;
 
 import android.Manifest;
 import android.animation.Animator;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Point;
+import android.graphics.PointF;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.Icon;
 import android.net.Uri;
@@ -422,6 +425,26 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
             }
             */
         });
+
+        /*new ShowCaseView.Builder(MainActivity.this)
+                .withTypedPosition(new Center())
+                .dismissOnTouch(true)
+                .withDismissListener(new ShowCaseView.DismissListener() {
+                    @Override
+                    public void onDismiss() {
+                        new ShowCaseView.Builder(MainActivity.this)
+                                .withTypedPosition(new ViewPosition(siteLink))
+                                .dismissOnTouch(true)
+                                .withContent("Hello and welcome to MangaWorld")
+                                .build()
+                                .show(MainActivity.this);
+                    }
+                })
+                .withContent("Hello and welcome to MangaWorld")
+                .build()
+                .show(this);*/
+
+
 
     }
 
