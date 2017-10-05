@@ -9,10 +9,12 @@ import android.os.Looper;
 import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -34,6 +36,7 @@ import manga.mangaapp.mangaedenclient.Chapter;
 import manga.mangaapp.mangaedenclient.ChapterPage;
 import manga.mangaapp.mangaedenclient.MangaEdenClient;
 import manga.mangaapp.manymanga.data.Image;
+import programmer.box.utilityhelper.UtilNotification;
 
 /**
  * Created by Jacob on 8/23/17.
@@ -149,7 +152,7 @@ public class ChapterListAdapter extends RecyclerView.Adapter<ChapterListAdapter.
 
         layout.setOnClickListener(onClickListener);
 
-        ImageButton downloadChapter = holder.downloadChapter;
+        final ImageButton downloadChapter = holder.downloadChapter;
         downloadChapter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -160,8 +163,6 @@ public class ChapterListAdapter extends RecyclerView.Adapter<ChapterListAdapter.
                 lpd.setTitle("Please Wait...");
                 lpd.setTitleGravity(Gravity.CENTER);
 
-
-
                 new RetrieveInfo(new AsyncTasks() {
                     @Override
                     public void onPreExecute() {
@@ -170,8 +171,6 @@ public class ChapterListAdapter extends RecyclerView.Adapter<ChapterListAdapter.
 
                     @Override
                     public boolean doInBackground() {
-
-
 
                         try {
                             images = client.getChapterDetails(mDataset[position].getId()).getPages();
@@ -191,6 +190,23 @@ public class ChapterListAdapter extends RecyclerView.Adapter<ChapterListAdapter.
                     }
                 }).execute();
 
+            }
+        });
+
+        downloadChapter.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                UtilNotification.showMenu(v.getContext(), v, new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        if(item.getTitle().equals("Download Chapter")) {
+                            downloadChapter.callOnClick();
+                            return true;
+                        }
+                        return false;
+                    }
+                }, "Download Chapter");
+                return true;
             }
         });
 

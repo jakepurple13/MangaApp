@@ -2,10 +2,12 @@ package manga.mangaapp;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
@@ -29,6 +31,7 @@ import manga.mangaapp.mangaedenclient.ChapterPage;
 import manga.mangaapp.mangaedenclient.MangaDetails;
 import manga.mangaapp.mangaedenclient.MangaEdenClient;
 import manga.mangaapp.manymanga.data.Image;
+import programmer.box.utilityhelper.UtilNotification;
 
 /**
  * Created by Jacob on 9/28/17.
@@ -100,6 +103,14 @@ public class AppUtil {
             protected void onPostExecute(Boolean aBoolean) {
                 super.onPostExecute(aBoolean);
                 lpd.dismiss();
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    UtilNotification.createNotificationChannel(context, "manga", "downloaded", "manga_is_downloaded");
+                    UtilNotification.createNotificationGroup(context, "group_manga_id", "group_manga");
+                }
+
+                UtilNotification.sendNotification(context, android.R.mipmap.sym_def_app_icon, "Downloaded", title + " is downloaded", "manga_is_downloaded", MainActivity.class, 1);
+
             }
 
             @Override

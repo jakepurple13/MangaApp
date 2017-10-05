@@ -3,6 +3,7 @@ package manga.mangaapp.MangaSide;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
@@ -456,14 +457,27 @@ public class MangaInfoActivity extends AppCompatActivity {
     }
 
     public void showAlert(String title, String text, int resid) {
+
+        int color = getColor(R.color.colorPrimary);
+
+        if(mangaDetails.getImage()!=null) {
+            color = p.getDarkVibrantColor(getColor(R.color.md_black_1000));
+        }
+
+        String hex = "#"+Integer.toHexString(color).substring(2);
+
+        color = Color.parseColor(hex);
+
+        Help.v(color + " is the color and hex is " + hex);
+
         Alerter.create(this)
                 .setTitle(title)
                 .setText(text)
                 .enableSwipeToDismiss()
                 .setIcon(resid)
+                .setBackgroundColorInt(color)
                 .enableIconPulse(false)
                 .showIcon(true)
-                .setBackgroundColorRes(R.color.colorPrimary)
                 .show();
     }
 

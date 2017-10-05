@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -16,6 +17,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.Window;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.Button;
@@ -52,6 +54,7 @@ import manga.mangaapp.mangaedenclient.ChapterPage;
 import manga.mangaapp.mangaedenclient.MangaDetails;
 import manga.mangaapp.mangaedenclient.MangaEden;
 import manga.mangaapp.mangaedenclient.MangaEdenClient;
+import programmer.box.utilityhelper.UtilNotification;
 
 public class ReadManga extends AppCompatActivity {
 
@@ -92,6 +95,9 @@ public class ReadManga extends AppCompatActivity {
         setSupportActionBar(mToolbar);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        Window window = getWindow();
+        window.setStatusBarColor(getColor(R.color.cardview_dark_background));
 
         final String chapterID = getIntent().getStringExtra("chapter_id");
         final String mangaID = getIntent().getStringExtra("manga_id");
@@ -207,6 +213,12 @@ public class ReadManga extends AppCompatActivity {
                                 e.printStackTrace();
                             } catch (ArrayIndexOutOfBoundsException e) {
                                 e.printStackTrace();
+                                UtilNotification.showSnackbar(pageCount, "You're all caught up!", UtilNotification.Lengths.LONG, "Awesome!", new UtilNotification.SnackBarAction() {
+                                    @Override
+                                    public void snackClick(Snackbar snackbar) {
+                                        snackbar.dismiss();
+                                    }
+                                });
                                 ReadManga.this.finish();
                             }
                             return true;

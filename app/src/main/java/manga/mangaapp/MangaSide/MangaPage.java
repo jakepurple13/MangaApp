@@ -15,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bogdwellers.pinchtozoom.ImageMatrixTouchHandler;
+import com.otaliastudios.zoom.ZoomImageView;
 import com.squareup.picasso.Picasso;
 
 import java.net.URI;
@@ -78,6 +79,7 @@ public class MangaPage extends PagerAdapter {
             });
 
             //iv.setOnClickListener(menuShow);
+
 
         }
 

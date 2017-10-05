@@ -21,7 +21,7 @@ android {
     buildToolsVersion "26.0.1"
     defaultConfig {
         applicationId "manga.mangaapp"
-        minSdkVersion 23
+        minSdkVersion 24
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
@@ -52,7 +52,7 @@ dependencies {
         transitive = true
     }
 
-    //compile 'com.github.jakepurple13:HelperUtils2:v0.4'
+    compile 'com.github.jakepurple13:HelperUtils2:v0.5'
 
     compile 'com.mtramin:rxfingerprint:2.1.0'
 
@@ -66,6 +66,8 @@ dependencies {
     compile("jp.s64.android:animatedtoolbar:${animated_toolbar_version}") {
         exclude group: 'com.android.support', module: 'appcompat-v7'
     }
+
+    compile 'com.otaliastudios:zoomlayout:1.0.1'
 
     compile 'com.tapadoo.android:alerter:2.0.1'
     compile 'com.yashoid:instacropper:1.0.6'
