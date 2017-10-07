@@ -87,6 +87,8 @@ public class ReadManga extends AppCompatActivity {
 
     final int DELAY_AMOUNT = 5000;
 
+    int chapterNumber;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -102,7 +104,7 @@ public class ReadManga extends AppCompatActivity {
         final String chapterID = getIntent().getStringExtra("chapter_id");
         final String mangaID = getIntent().getStringExtra("manga_id");
         final String mangaTitle = getIntent().getStringExtra("manga_title");
-        final int chapterNumber = getIntent().getIntExtra("chapter_number", 0);
+        chapterNumber = getIntent().getIntExtra("chapter_number", 0);
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
@@ -204,9 +206,11 @@ public class ReadManga extends AppCompatActivity {
 
                                 Chapter[] c = mangaDetails.getChapters();
 
-                                chapID = c[chapterNumber+1].getId();
+                                chapterNumber++;
 
-                                SharedPreferencesManager.getInstance().putValue(mangaID, c[chapterNumber+1].getNumber());
+                                chapID = c[chapterNumber].getId();
+
+                                SharedPreferencesManager.getInstance().putValue(mangaID, c[chapterNumber].getNumber());
 
                                 Help.e(Arrays.toString(pages));
                             } catch (IOException e) {

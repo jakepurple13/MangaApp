@@ -5,6 +5,8 @@
 
     <item android:title="Date" android:id="@+id/sort_date" />
 
+    <item android:title="Random" android:id="@+id/sort_random" />
+
     <item android:title="Cancel" android:id="@+id/sort_cancel" />
 
 </menu>

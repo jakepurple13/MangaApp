@@ -1092,6 +1092,15 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
                     dialog.setOnItemSelectedListener(new BottomDialog.OnItemSelectedListener() {
                         @Override
                         public boolean onItemSelected(int id) {
+
+                            dialog.dismiss();
+
+                            if (id != R.id.sort_cancel) {
+                                sortManga(id);
+                                return true;
+                            }
+
+                            /*
                             switch (id) {
                                 case R.id.sort_title:
                                     sortManga(id);
@@ -1101,12 +1110,18 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
                                     sortManga(id);
                                     dialog.dismiss();
                                     return true;
+                                case R.id.sort_random:
+                                    sortManga(id);
+                                    dialog.dismiss();
                                 case R.id.sort_cancel:
                                     dialog.dismiss();
                                     return true;
                                 default:
                                     return false;
-                            }
+                            }*/
+
+                            return false;
+
                         }
                     });
                     dialog.show();
@@ -1461,8 +1476,13 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
     }
 
     public void sortManga(int id) {
-        Comparator<Manga> sorter = mangaSort(id);
-        Collections.sort(mangaArrayList, sorter);
+
+        if(id==R.id.sort_random) {
+            Collections.shuffle(mangaArrayList);
+        } else {
+            Comparator<Manga> sorter = mangaSort(id);
+            Collections.sort(mangaArrayList, sorter);
+        }
 
         mAdapter = new MangaAdapter(mangaArrayList, MainActivity.this, client, currentLayout);
         mRecyclerView.setAdapter(mAdapter);

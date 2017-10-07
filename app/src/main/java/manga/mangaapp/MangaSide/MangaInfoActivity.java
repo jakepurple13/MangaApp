@@ -1,6 +1,7 @@
 package manga.mangaapp.MangaSide;
 
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -304,6 +305,8 @@ public class MangaInfoActivity extends AppCompatActivity {
 
                     Window window = getWindow();
                     window.setStatusBarColor(darkVibrant);
+
+                    favButton.setBackgroundTintList(ColorStateList.valueOf(darkVibrant));
 
                     chapterListAdapter = new ChapterListAdapter(chapters, MangaInfoActivity.this, mangaID, chapterID, mangaDetails.getTitle(), client, darkVibrant);
 
