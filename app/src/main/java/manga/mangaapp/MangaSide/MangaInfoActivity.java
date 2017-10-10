@@ -287,6 +287,7 @@ public class MangaInfoActivity extends AppCompatActivity {
                     getSupportActionBar().setBackgroundDrawable(new ColorDrawable(vibrantColor));
 
                     String hex = "#"+Integer.toHexString(darkVibrant).substring(2);
+                    String hex1 = "#"+Integer.toHexString(vibrantColor).substring(2);
 
                     getSupportActionBar().setTitle(Html.fromHtml("<font color='"+hex+"'>"+mangaDetails.getTitle()+"</font>"));
 
@@ -297,6 +298,8 @@ public class MangaInfoActivity extends AppCompatActivity {
                     description.setBackgroundColor(vibrantColor);
 
                     Help.d(darkVibrant + " color and " + hex);
+
+                    Help.d(vibrantColor + " color and " + hex1);
 
                     link.setBackgroundColor(vibrantColor);
                     title.setTextColor(darkVibrant);

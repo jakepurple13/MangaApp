@@ -2,6 +2,7 @@ package manga.mangaapp;
 
 import android.Manifest;
 import android.animation.Animator;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
@@ -154,6 +155,9 @@ import manga.mangaapp.manymanga.sites.implementations.english.Tapastic;
 import me.gujun.android.taggroup.TagGroup;
 import pl.aprilapps.easyphotopicker.DefaultCallback;
 import pl.aprilapps.easyphotopicker.EasyImage;
+import programmer.box.utilityhelper.UtilAsyncTask;
+import programmer.box.utilityhelper.UtilDevice;
+import programmer.box.utilityhelper.UtilLog;
 import rebus.bottomdialog.BottomDialog;
 import rebus.bottomdialog.Item;
 
@@ -231,6 +235,8 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
         mRecyclerView = findViewById(R.id.manga_list);
 
         mRecyclerView.addItemDecoration(new DividerItemDecoration(this, RecyclerView.VERTICAL));
+
+        mRecyclerView.setItemViewCacheSize(20);
 
         siteLink = findViewById(R.id.site_link);
 
@@ -447,11 +453,12 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
                 .build()
                 .show(this);*/
 
-
-
     }
 
+
+
     public void getMangaEden() {
+
         new RetrieveInfo(new AsyncTasks() {
             @Override
             public void onPostExecute(Boolean success) {

@@ -2,6 +2,7 @@ package manga.mangaapp;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
@@ -14,9 +15,11 @@ import android.text.SpannableString;
 import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -35,6 +38,7 @@ import manga.mangaapp.mangaedenclient.MangaDetails;
 import manga.mangaapp.mangaedenclient.MangaEden;
 import manga.mangaapp.mangaedenclient.MangaEdenClient;
 import programmer.box.utilityhelper.UtilImage;
+import programmer.box.utilityhelper.UtilNotification;
 
 /**
  * Created by Jacob on 8/17/17.
@@ -190,6 +194,13 @@ public class MangaAdapter extends RecyclerView.Adapter<MangaAdapter.ViewHolder>{
                                     int light = p.getLightVibrantColor(in.getColor(R.color.white));
                                     int dark = p.getDarkVibrantColor(in.getColor(R.color.md_black_1000));
 
+                                    String hex = "#" + Integer.toHexString(light).substring(2);
+                                    if(hex.trim().toLowerCase().matches("#(f[5-9|a-f]){3}")) {
+                                        tv.setTextColor(light);
+                                        holder.chapterCount.setTextColor(light);
+                                        light = dark;
+                                    }
+
                                     //tv.setTextColor(dark);
                                     tv.setBackgroundColor(light);
 
@@ -252,13 +263,38 @@ public class MangaAdapter extends RecyclerView.Adapter<MangaAdapter.ViewHolder>{
             }
         };
 
+        View.OnLongClickListener onLongClickListener = new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(final View v) {
+
+                UtilNotification.showMenu(v.getContext(), v, new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+
+                        if(item.getTitle().equals("Read Manga")) {
+                            v.callOnClick();
+                            return true;
+                        }
+
+                        return false;
+                    }
+                }, "Read Manga");
+
+                return true;
+            }
+        };
+
         ib.setOnClickListener(onClickListener);
         tv.setOnClickListener(onClickListener);
+        ib.setOnLongClickListener(onLongClickListener);
+        tv.setOnLongClickListener(onLongClickListener);
         if(layoutType.equals(Layouts.DETAILS)) {
             TextView details = holder.summary;
             TextView chaperCount = holder.chapterCount;
             details.setOnClickListener(onClickListener);
             chaperCount.setOnClickListener(onClickListener);
+            details.setOnLongClickListener(onLongClickListener);
+            chaperCount.setOnLongClickListener(onLongClickListener);
         }
 
     }

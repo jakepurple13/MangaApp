@@ -7,5 +7,6 @@ public interface AsyncTasks {
     void onPostExecute(Boolean success);
     //void onProgessUpdate(Integer... progress);
     //void publishYourProgress(Integer... progress);
+    //abstract void updatethis();
 
 }
