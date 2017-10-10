@@ -2,10 +2,13 @@ package manga.mangaapp;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.GradientDrawable;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
 import android.text.SpannableString;
 import android.text.style.StyleSpan;
@@ -14,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.squareup.picasso.Callback;
@@ -30,6 +34,7 @@ import manga.mangaapp.mangaedenclient.Manga;
 import manga.mangaapp.mangaedenclient.MangaDetails;
 import manga.mangaapp.mangaedenclient.MangaEden;
 import manga.mangaapp.mangaedenclient.MangaEdenClient;
+import programmer.box.utilityhelper.UtilImage;
 
 /**
  * Created by Jacob on 8/17/17.
@@ -53,15 +58,20 @@ public class MangaAdapter extends RecyclerView.Adapter<MangaAdapter.ViewHolder>{
     public static class ViewHolder extends RecyclerView.ViewHolder {
         // each data item is just a string in this case
         public TextView mTextView;
+        public TextView chapterCount;
         public ImageView imageView;
         public TextView summary;
+        public RelativeLayout layout;
 
         public ViewHolder(View v, Layouts layouts) {
             super(v);
             mTextView = (TextView) v.findViewById(R.id.name);
             imageView = v.findViewById(R.id.imageButton);
-            if(layouts.equals(Layouts.DETAILS))
+            layout = v.findViewById(R.id.manga_layout);
+            if(layouts.equals(Layouts.DETAILS)) {
                 summary = v.findViewById(R.id.details);
+                chapterCount = v.findViewById(R.id.chapter_count);
+            }
         }
     }
 
@@ -117,7 +127,7 @@ public class MangaAdapter extends RecyclerView.Adapter<MangaAdapter.ViewHolder>{
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
 
-        TextView tv = holder.mTextView;
+        final TextView tv = holder.mTextView;
         final ImageView ib = holder.imageView;
         tv.setText(mDataset.get(position).getTitle());
         tv.setTypeface(null, Typeface.BOLD);
@@ -134,8 +144,8 @@ public class MangaAdapter extends RecyclerView.Adapter<MangaAdapter.ViewHolder>{
             public boolean doInBackground() {
                 try {
                     // Get manga details
-                    MangaDetails mangaDetails = client.getMangaDetails(manga.getId());
-                    Chapter[] chapters = mangaDetails.getChapters();
+                    final MangaDetails mangaDetails = client.getMangaDetails(manga.getId());
+                    final Chapter[] chapters = mangaDetails.getChapters();
                     try {
 
                         // Get chapter details
@@ -145,7 +155,9 @@ public class MangaAdapter extends RecyclerView.Adapter<MangaAdapter.ViewHolder>{
                         // Get chapter page image URLs
                         //final URI imageUrl = pages[0].getImageURI();
                         final URI imageUrl = MangaEden.manga2ImageURI(mangaDetails.getImage());
-                        final String detail = "Chapter Count: " + chapters.length+"\n\n"+mangaDetails.getDescription();
+                        final Palette p = UtilImage.getPalatteFromUrl(String.valueOf(imageUrl));
+                        //final String detail = "Chapter Count: " + chapters.length+"\n\n"+mangaDetails.getDescription();
+                        final String detail = mangaDetails.getDescription();
                         Handler uiHandler = new Handler(Looper.getMainLooper());
                         uiHandler.post(new Runnable() {
                             @Override
@@ -157,6 +169,8 @@ public class MangaAdapter extends RecyclerView.Adapter<MangaAdapter.ViewHolder>{
                                 if(layoutType.equals(Layouts.DETAILS)) {
                                     TextView details = holder.summary;
                                     details.setText(detail);
+                                    TextView chapterCount = holder.chapterCount;
+                                    chapterCount.setText("Chapters: " + chapters.length);
                                     width*=.5;
                                     height*=.5;
                                 } else {
@@ -171,9 +185,46 @@ public class MangaAdapter extends RecyclerView.Adapter<MangaAdapter.ViewHolder>{
                                         .placeholder(android.R.mipmap.sym_def_app_icon)
                                         .into(ib);
 
+                                if(mangaDetails.getImage()!=null) {
+
+                                    int light = p.getLightVibrantColor(in.getColor(R.color.white));
+                                    int dark = p.getDarkVibrantColor(in.getColor(R.color.md_black_1000));
+
+                                    //tv.setTextColor(dark);
+                                    tv.setBackgroundColor(light);
+
+                                    if(layoutType.equals(Layouts.DETAILS)) {
+                                        //holder.summary.setTextColor(dark);
+                                        //holder.chapterCount.setBackgroundColor(p.getLightMutedColor(in.getColor(R.color.md_black_1000)));
+                                        //holder.chapterCount.setBackgroundColor(p.getDarkMutedColor(in.getColor(R.color.md_black_1000)));
+                                        //holder.chapterCount.setBackgroundColor(p.getVibrantColor(in.getColor(R.color.white)));
+                                        holder.chapterCount.setBackgroundColor(AppUtil.lighter(light, 0.5f));
+                                        holder.summary.setBackgroundColor(in.getColor(R.color.white));
+                                    }
+
+                                    int[] colors = {in.getColor(R.color.white), light, in.getColor(R.color.white)};
+
+                                    //create a new gradient color
+                                    GradientDrawable gd = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, colors);
+
+                                    //ib.setBackgroundColor(light);
+
+
+                                    //gd.setCornerRadius(0f);
+                                    //apply the button background to newly created drawable gradient
+                                    //holder.layout.setBackground(gd);
+
+                                    holder.layout.setBackgroundColor(light);
+                                }
+
                                 Help.e("IB STUFF", ib.getDrawable().getBounds().flattenToString());
                             }
                         });
+
+
+
+
+
                     } catch (ArrayIndexOutOfBoundsException e1) {
                         e1.printStackTrace();
                     }
@@ -205,7 +256,9 @@ public class MangaAdapter extends RecyclerView.Adapter<MangaAdapter.ViewHolder>{
         tv.setOnClickListener(onClickListener);
         if(layoutType.equals(Layouts.DETAILS)) {
             TextView details = holder.summary;
+            TextView chaperCount = holder.chapterCount;
             details.setOnClickListener(onClickListener);
+            chaperCount.setOnClickListener(onClickListener);
         }
 
     }

@@ -26,6 +26,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
@@ -228,6 +229,8 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
         mangaSearchList = new ArrayList<>();
 
         mRecyclerView = findViewById(R.id.manga_list);
+
+        mRecyclerView.addItemDecoration(new DividerItemDecoration(this, RecyclerView.VERTICAL));
 
         siteLink = findViewById(R.id.site_link);
 
