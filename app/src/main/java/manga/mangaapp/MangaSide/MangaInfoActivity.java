@@ -277,7 +277,7 @@ public class MangaInfoActivity extends AppCompatActivity {
                 });
 
                 //if(p!=null) {
-                if(mangaDetails.getImage()!=null) {
+                if(mangaDetails.getImage()!=null && SharedPreferencesManager.getInstance().getValue("manga_color", Boolean.class, true)) {
 
                     int vibrantColor = p.getLightVibrantColor(getColor(R.color.white));
                     int darkVibrant = p.getDarkVibrantColor(getColor(R.color.md_black_1000));

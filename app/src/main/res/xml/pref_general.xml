@@ -1,0 +1,9 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="manga_color"
+        android:summary="Color app based off of a manga cover"
+        android:title="Use Colors" />
+
+</PreferenceScreen>

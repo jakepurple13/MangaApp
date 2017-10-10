@@ -4,11 +4,13 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.USE_FINGERPRINT" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.NFC" />
 
-    <uses-feature android:name="android.hardware.nfc" android:required="false" />
+    <uses-feature
+        android:name="android.hardware.nfc"
+        android:required="false" />
 
     <application
         android:name=".StoryWorld"
@@ -28,52 +30,89 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MangaSide.MangaInfoActivity"
+        <activity
+            android:name=".MangaSide.MangaInfoActivity"
             android:screenOrientation="portrait">
-
             <intent-filter android:autoVerify="true">
-
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="http" android:host="www.mangaworld.com" android:pathPrefix="/me" />
-                <data android:scheme="https" android:host="mobile.mangaworld.com" android:pathPrefix="/me" />
 
+                <data
+                    android:host="www.mangaworld.com"
+                    android:pathPrefix="/me"
+                    android:scheme="http" />
+                <data
+                    android:host="mobile.mangaworld.com"
+                    android:pathPrefix="/me"
+                    android:scheme="https" />
             </intent-filter>
-
         </activity>
-
-        <activity android:name=".MangaSide.MangaSiteInfoActivity"
+        <activity
+            android:name=".MangaSide.MangaSiteInfoActivity"
             android:screenOrientation="portrait">
-
             <intent-filter android:autoVerify="true">
-
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <!--MangaReader-->
-                <data android:scheme="http" android:host="www.mangaworld.com" android:pathPrefix="/mr" />
-                <data android:scheme="https" android:host="mobile.mangaworld.com" android:pathPrefix="/mr" />
-                <!--MangaPanda-->
-                <data android:scheme="http" android:host="www.mangaworld.com" android:pathPrefix="/mp" />
-                <data android:scheme="https" android:host="mobile.mangaworld.com" android:pathPrefix="/mp" />
-                <!--LINEWebtoon-->
-                <data android:scheme="http" android:host="www.mangaworld.com" android:pathPrefix="/lw" />
-                <data android:scheme="https" android:host="mobile.mangaworld.com" android:pathPrefix="/lw" />
-                <!--MangaFox-->
-                <data android:scheme="http" android:host="www.mangaworld.com" android:pathPrefix="/mf" />
-                <data android:scheme="https" android:host="mobile.mangaworld.com" android:pathPrefix="/mf" />
-                <!--MangaHere-->
-                <data android:scheme="http" android:host="www.mangaworld.com" android:pathPrefix="/mh" />
-                <data android:scheme="https" android:host="mobile.mangaworld.com" android:pathPrefix="/mh" />
-                <!--ReadMangaToday-->
-                <data android:scheme="http" android:host="www.mangaworld.com" android:pathPrefix="/rmt" />
-                <data android:scheme="https" android:host="mobile.mangaworld.com" android:pathPrefix="/rmt" />
-
-
+                <!-- MangaReader -->
+                <data
+                    android:host="www.mangaworld.com"
+                    android:pathPrefix="/mr"
+                    android:scheme="http" />
+                <data
+                    android:host="mobile.mangaworld.com"
+                    android:pathPrefix="/mr"
+                    android:scheme="https" />
+                <!-- MangaPanda -->
+                <data
+                    android:host="www.mangaworld.com"
+                    android:pathPrefix="/mp"
+                    android:scheme="http" />
+                <data
+                    android:host="mobile.mangaworld.com"
+                    android:pathPrefix="/mp"
+                    android:scheme="https" />
+                <!-- LINEWebtoon -->
+                <data
+                    android:host="www.mangaworld.com"
+                    android:pathPrefix="/lw"
+                    android:scheme="http" />
+                <data
+                    android:host="mobile.mangaworld.com"
+                    android:pathPrefix="/lw"
+                    android:scheme="https" />
+                <!-- MangaFox -->
+                <data
+                    android:host="www.mangaworld.com"
+                    android:pathPrefix="/mf"
+                    android:scheme="http" />
+                <data
+                    android:host="mobile.mangaworld.com"
+                    android:pathPrefix="/mf"
+                    android:scheme="https" />
+                <!-- MangaHere -->
+                <data
+                    android:host="www.mangaworld.com"
+                    android:pathPrefix="/mh"
+                    android:scheme="http" />
+                <data
+                    android:host="mobile.mangaworld.com"
+                    android:pathPrefix="/mh"
+                    android:scheme="https" />
+                <!-- ReadMangaToday -->
+                <data
+                    android:host="www.mangaworld.com"
+                    android:pathPrefix="/rmt"
+                    android:scheme="http" />
+                <data
+                    android:host="mobile.mangaworld.com"
+                    android:pathPrefix="/rmt"
+                    android:scheme="https" />
             </intent-filter>
-<!--
-
+            <!--
             <intent-filter android:autoVerify="true">
                 &lt;!&ndash;MangaPanda&ndash;&gt;
                 <action android:name="android.intent.action.VIEW" />
@@ -83,7 +122,7 @@
                 <data android:scheme="https" android:host="mobile.mangaworld.com" android:pathPrefix="/mp" />
 
             </intent-filter>
--->
+            -->
 
         </activity>
         <activity
@@ -94,11 +133,16 @@
             android:name=".MangaSide.ReadMangaSite"
             android:screenOrientation="portrait"
             android:theme="@style/Base.Theme.AppCompat.NoBar" />
-        <!--<activity android:name=".UserInfo.Favorites" />-->
+        <!-- <activity android:name=".UserInfo.Favorites" /> -->
         <activity android:name=".MainHub" />
+
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="b2aa4fb9f3ba5babd156bae0537b7f764c7146fa" />
+
+        <activity
+            android:name=".Settings.SettingsActivity"
+            android:label="@string/title_activity_settings"></activity>
     </application>
 
 </manifest>

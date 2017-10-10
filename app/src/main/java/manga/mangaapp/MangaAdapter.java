@@ -23,6 +23,7 @@ import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.kingfisher.easy_sharedpreference_library.SharedPreferencesManager;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
@@ -189,7 +190,7 @@ public class MangaAdapter extends RecyclerView.Adapter<MangaAdapter.ViewHolder>{
                                         .placeholder(android.R.mipmap.sym_def_app_icon)
                                         .into(ib);
 
-                                if(mangaDetails.getImage()!=null) {
+                                if(mangaDetails.getImage()!=null && SharedPreferencesManager.getInstance().getValue("manga_color", Boolean.class, true)) {
 
                                     int light = p.getLightVibrantColor(in.getColor(R.color.white));
                                     int dark = p.getDarkVibrantColor(in.getColor(R.color.md_black_1000));
@@ -231,9 +232,6 @@ public class MangaAdapter extends RecyclerView.Adapter<MangaAdapter.ViewHolder>{
                                 Help.e("IB STUFF", ib.getDrawable().getBounds().flattenToString());
                             }
                         });
-
-
-
 
 
                     } catch (ArrayIndexOutOfBoundsException e1) {

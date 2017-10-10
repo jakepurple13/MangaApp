@@ -91,6 +91,7 @@ import com.mikepenz.materialdrawer.model.ExpandableDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
+import com.mikepenz.materialdrawer.model.SwitchDrawerItem;
 import com.mikepenz.materialdrawer.model.ToggleDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
@@ -1074,6 +1075,15 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
             }
         });
 
+        SwitchDrawerItem colorUse = new SwitchDrawerItem().withIdentifier(899).withSelectable(false).withName("Use Color").withChecked(SharedPreferencesManager.getInstance().getValue("manga_color", Boolean.class, true)).withOnCheckedChangeListener(new OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(IDrawerItem drawerItem, CompoundButton buttonView, boolean isChecked) {
+                SharedPreferencesManager.getInstance().putValue("manga_color", isChecked);
+                mRecyclerView.setAdapter(mAdapter);
+            }
+        });
+
+
         logout = new PrimaryDrawerItem().withIdentifier(89).withSelectable(false).withName("Logout").withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
             @Override
             public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
@@ -1264,7 +1274,10 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
                         new DividerDrawerItem(),
                         home,
                         gotoFavorites,
+                        new DividerDrawerItem(),
+                        colorUse,
                         settings,
+                        new DividerDrawerItem(),
                         logout
                         /*,
                         new ExpandableDrawerItem().withName("Collapsable").withIcon(GoogleMaterial.Icon.gmd_collections_bookmark).withIdentifier(19).withSelectable(false).withSubItems(
