@@ -56,6 +56,8 @@ public class MangaAdapter extends RecyclerView.Adapter<MangaAdapter.ViewHolder>{
     ChapterPage[] chaptersList;
     Layouts layoutType;
 
+    boolean isDownload = false;
+
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
     // you provide access to all the views for a data item in a view holder
@@ -87,6 +89,14 @@ public class MangaAdapter extends RecyclerView.Adapter<MangaAdapter.ViewHolder>{
         this.in = in;
         this.client = client;
         this.layoutType = layoutType;
+    }
+
+    public MangaAdapter(ArrayList<Manga> myDataset, Activity in, MangaEdenClient client, Layouts layoutType, boolean isDownload) {
+        mDataset = myDataset;
+        this.in = in;
+        this.client = client;
+        this.layoutType = layoutType;
+        this.isDownload = isDownload;
     }
 
     // Create new views (invoked by the layout manager)
@@ -256,6 +266,7 @@ public class MangaAdapter extends RecyclerView.Adapter<MangaAdapter.ViewHolder>{
 
                 Intent i = new Intent(in, MangaInfoActivity.class);
                 i.putExtra("manga_id", manga.getId());
+                i.putExtra("manga_downloaded", isDownload);
                 in.startActivity(i);
 
             }

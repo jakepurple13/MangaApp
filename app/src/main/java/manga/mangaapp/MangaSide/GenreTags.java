@@ -1,5 +1,8 @@
 package manga.mangaapp.MangaSide;
 
+import manga.mangaapp.R;
+import manga.mangaapp.StoryWorld;
+
 /**
  * Created by Jacob on 8/24/17.
  */
@@ -56,39 +59,39 @@ public class GenreTags {
 
     public enum Tags {
 
-        ACTION("Action"),
-        ADULT("Adult"),
-        ADVENTURE("Adventure"),
-        COMEDY("Comedy"),
-        DOUJINSHI("Doujinshi"),
-        DRAMA("Drama"),
-        ECCHI("Ecchi"),
-        FANTASY("Fantasy"),
-        GENDER_BENDER("Gender Bender"),
-        HAREM("Harem"),
-        HISTORICAL("Historical"),
-        HORROR("Horror"),
-        JOSEI("Josei"),
-        MARTIAL_ARTS("Martial Arts"),
-        MATURE("Mature"),
-        MECHA("Mecha"),
-        MYSTERY("Mystery"),
-        ONE_SHOT("One Shot"),
-        PSYCHOLOGICAL("Psychological"),
-        ROMANCE("Romance"),
-        SCHOOL_LIFE("School Life"),
-        SCI_FI("Sci-fi"),
-        SEINEN("Seinen"),
-        SHOUJO("Shoujo"),
-        SHOUNEN("Shounen"),
-        SLICE_OF_LIFE("Slife of Life"),
-        SMUT("Smut"),
-        SPORTS("Sports"),
-        SUPERNATURAL("Supernatural"),
-        TRAGEDY("Tragedy"),
-        WEBTOONS("Webtoons"),
-        YAOI("Yaoi"),
-        YURI("Yuri");
+        ACTION(StoryWorld.getResource(R.string.action)),
+        ADULT(StoryWorld.getResource(R.string.adult)),
+        ADVENTURE(StoryWorld.getResource(R.string.adventure)),
+        COMEDY(StoryWorld.getResource(R.string.comedy)),
+        DOUJINSHI(StoryWorld.getResource(R.string.doujinshi)),
+        DRAMA(StoryWorld.getResource(R.string.drama)),
+        ECCHI(StoryWorld.getResource(R.string.ecchi)),
+        FANTASY(StoryWorld.getResource(R.string.fantasy)),
+        GENDER_BENDER(StoryWorld.getResource(R.string.gender_bender)),
+        HAREM(StoryWorld.getResource(R.string.harem)),
+        HISTORICAL(StoryWorld.getResource(R.string.historical)),
+        HORROR(StoryWorld.getResource(R.string.horror)),
+        JOSEI(StoryWorld.getResource(R.string.josei)),
+        MARTIAL_ARTS(StoryWorld.getResource(R.string.martial_arts)),
+        MATURE(StoryWorld.getResource(R.string.mature)),
+        MECHA(StoryWorld.getResource(R.string.mecha)),
+        MYSTERY(StoryWorld.getResource(R.string.mystery)),
+        ONE_SHOT(StoryWorld.getResource(R.string.one_shot)),
+        PSYCHOLOGICAL(StoryWorld.getResource(R.string.psychological)),
+        ROMANCE(StoryWorld.getResource(R.string.romance)),
+        SCHOOL_LIFE(StoryWorld.getResource(R.string.school_life)),
+        SCI_FI(StoryWorld.getResource(R.string.sci_fi)),
+        SEINEN(StoryWorld.getResource(R.string.seinen)),
+        SHOUJO(StoryWorld.getResource(R.string.shoujo)),
+        SHOUNEN(StoryWorld.getResource(R.string.shounen)),
+        SLICE_OF_LIFE(StoryWorld.getResource(R.string.slice_of_life)),
+        SMUT(StoryWorld.getResource(R.string.smut)),
+        SPORTS(StoryWorld.getResource(R.string.sports)),
+        SUPERNATURAL(StoryWorld.getResource(R.string.supernatural)),
+        TRAGEDY(StoryWorld.getResource(R.string.tragedy)),
+        WEBTOONS(StoryWorld.getResource(R.string.webtoons)),
+        YAOI(StoryWorld.getResource(R.string.yaoi)),
+        YURI(StoryWorld.getResource(R.string.yuri));
 
         public String tag;
 

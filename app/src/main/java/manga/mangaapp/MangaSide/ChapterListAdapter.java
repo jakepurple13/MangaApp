@@ -158,9 +158,9 @@ public class ChapterListAdapter extends RecyclerView.Adapter<ChapterListAdapter.
             public void onClick(View view) {
 
                 LovelyProgressDialog lpd = new LovelyProgressDialog(in);
-                lpd.setMessage("Getting Manga");
+                lpd.setMessage(in.getString(R.string.getting_manga));
                 lpd.setMessageGravity(Gravity.CENTER);
-                lpd.setTitle("Please Wait...");
+                lpd.setTitle(in.getString(R.string.please_wait));
                 lpd.setTitleGravity(Gravity.CENTER);
 
                 new RetrieveInfo(new AsyncTasks() {
@@ -185,27 +185,80 @@ public class ChapterListAdapter extends RecyclerView.Adapter<ChapterListAdapter.
                     @Override
                     public void onPostExecute(Boolean success) {
 
-                        AppUtil.downloadChapter(in, images, mangaTitle, mDataset[position].getNumber(), true);
+                        AppUtil.downloadChapter(in, images, mangaTitle, mangaID, mDataset[position].getNumber(), true);
 
                     }
                 }).execute();
 
             }
         });
+        
+        final String downloadChapterString = in.getResources().getString(R.string.download_chapter);
 
         downloadChapter.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public boolean onLongClick(View v) {
+            public boolean onLongClick(final View v) {
                 UtilNotification.showMenu(v.getContext(), v, new PopupMenu.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
-                        if(item.getTitle().equals("Download Chapter")) {
-                            downloadChapter.callOnClick();
+                        if(item.getTitle().equals(downloadChapterString)) {
+                            v.callOnClick();
                             return true;
                         }
                         return false;
                     }
-                }, "Download Chapter");
+                }, downloadChapterString);
+                return true;
+            }
+        });
+
+        tv.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(final View v) {
+                UtilNotification.showMenu(v.getContext(), v, new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        if(item.getTitle().equals(downloadChapterString)) {
+                            v.callOnClick();
+                            return true;
+                        }
+                        return false;
+                    }
+                }, downloadChapterString);
+                return true;
+            }
+        });
+
+        ib.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(final View v) {
+                UtilNotification.showMenu(v.getContext(), v, new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        if(item.getTitle().equals(downloadChapterString)) {
+                            v.callOnClick();
+                            return true;
+                        }
+                        return false;
+                    }
+                }, downloadChapterString);
+                return true;
+            }
+        });
+
+        layout.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(final View v) {
+                UtilNotification.showMenu(v.getContext(), v, new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        if(item.getTitle().equals(downloadChapterString)) {
+                            v.callOnClick();
+                            return true;
+                        }
+                        return false;
+                    }
+                }, downloadChapterString);
                 return true;
             }
         });

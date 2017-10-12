@@ -18,7 +18,7 @@ repositories {
 
 android {
     compileSdkVersion 26
-    buildToolsVersion "26.0.1"
+    buildToolsVersion '26.0.2'
     defaultConfig {
         applicationId "manga.mangaapp"
         minSdkVersion 24
@@ -56,6 +56,8 @@ dependencies {
     compile 'com.github.jakepurple13:HelperUtils2:v1.1'
 
     compile 'com.mtramin:rxfingerprint:2.1.0'
+
+    compile 'com.github.thiagokimo:KonamiCode:1.1.6'
 
     compile 'com.android.support:palette-v7:26.1.0'
 

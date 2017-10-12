@@ -77,4 +77,77 @@
     <string name="pref_ringtone_silent">Silent</string>
 
     <string name="pref_title_vibrate">Vibrate</string>
+
+    <string name="download_chapter">Download Chapter</string>
+    <string name="please_wait_">Please Wait…</string>
+    <string name="getting_manga">Getting Manga</string>
+    <string name="manga_is_downloaded">%s is Downloaded</string>
+    <string name="downloaded">Downloaded</string>
+    <string name="you">You</string>
+    <string name="search_here">Search Here</string>
+    <string name="logout">Logout</string>
+    <string name="login">Login</string>
+
+    <string name="please_wait">Please Wait</string>
+    <string name="authentication_failed">Authentication Failed</string>
+    <string name="account">Account</string>
+    <string name="sign_in_or_up">Sign in or Sign Up</string>
+    <string name="sign_in">Sign in</string>
+    <string name="current_source">Current Source is %s</string>
+    <string name="change_source">Change Source to %s</string>
+    <string name="pick_new_source">Pick New Source</string>
+    <string name="new_profile_picture">Choose a new Profile Picture</string>
+    <string name="choose_source">Choose Source</string>
+    <string name="favorites">Favorites</string>
+    <string name="home">Home</string>
+    <string name="use_color">Home</string>
+    <string name="cheat_mode">Use Color</string>
+    <string name="view_downloaded_chapters">Cheat Mode</string>
+    <string name="sort_by">View Downloaded Chapters</string>
+    <string name="choose_layout">Sort By</string>
+    <string name="choose_one">Choose Layout</string>
+    <string name="settings">Choose One</string>
+    <string name="pick_genre">Settings</string>
+    <string name="pick">Change Source to</string>
+    <string name="change_source_to">Are you sure you want to change source?</string>
+    <string name="are_sure_source">Yes Please</string>
+    <string name="yes_please">Never Mind</string>
+
+    <string name="genre_search">Genre Search</string>
+    <!--GENRE TAGS-->
+    <string name="action">Action</string>
+    <string name="adult">Adult</string>
+    <string name="adventure">Adventure</string>
+    <string name="comedy">Comedy</string>
+    <string name="doujinshi">Doujinshi</string>
+    <string name="drama">Drama</string>
+    <string name="ecchi">Ecchi</string>
+    <string name="fantasy">Fantasy</string>
+    <string name="gender_bender">Gender Bender</string>
+    <string name="harem">Harem</string>
+    <string name="historical">Historical</string>
+    <string name="horror">Horror</string>
+    <string name="josei">Josei</string>
+    <string name="martial_arts">Martial Arts</string>
+    <string name="mature">Mature</string>
+    <string name="mecha">Mecha</string>
+    <string name="mystery">Mystery</string>
+    <string name="one_shot">One Shot</string>
+    <string name="psychological">Psychological</string>
+    <string name="romance">Romance</string>
+    <string name="school_life">School Life</string>
+    <string name="sci_fi">Sci-fi</string>
+    <string name="seinen">Seinen</string>
+    <string name="shoujo">Shoujo</string>
+    <string name="shounen">Shounen</string>
+    <string name="slice_of_life">Slice of Life</string>
+    <string name="smut">Smut</string>
+    <string name="sports">Sports</string>
+    <string name="supernatural">Supernatural</string>
+    <string name="tragedy">Tragedy</string>
+    <string name="webtoons">Webtoons</string>
+    <string name="yaoi">Yaoi</string>
+    <string name="yuri">Yuri</string>
+    <!--GENRE TAGS-->
+
 </resources>

@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import manga.mangaapp.AppUtil;
 import manga.mangaapp.AsyncTasks;
 import manga.mangaapp.Help;
 import manga.mangaapp.Layouts;
@@ -54,6 +55,10 @@ public class Favorites extends Fragment {
 
     Activity a;
 
+    boolean download = false;
+
+    ArrayList<AppUtil.MangaFile> mangaFiles;
+
     public Favorites() {
         // Required empty public constructor
     }
@@ -64,10 +69,24 @@ public class Favorites extends Fragment {
         this.a = a;
     }
 
+    @SuppressLint("ValidFragment")
+    public Favorites(Activity a, ArrayList<AppUtil.MangaFile> mangaFiles, boolean download) {
+        // Required empty public constructor
+        this.a = a;
+        this.mangaFiles = mangaFiles;
+        this.download = download;
+    }
+
 
     // TODO: Rename and change types and number of parameters
     public static Favorites newInstance(Activity activity) {
         Favorites fragment = new Favorites(activity);
+        return fragment;
+    }
+
+    // TODO: Rename and change types and number of parameters
+    public static Favorites newInstance(Activity activity, ArrayList<AppUtil.MangaFile> mangaFiles, boolean download) {
+        Favorites fragment = new Favorites(activity, mangaFiles, download);
         return fragment;
     }
 
@@ -94,11 +113,24 @@ public class Favorites extends Fragment {
 
         if(user!=null) {
 
-            getFavorites();
+            if(download) {
+
+                getMangaEden();
+
+            } else {
+
+                getFavorites();
+
+            }
 
         } else {
             //Local
             Help.v("Hello there");
+
+            if(download) {
+                getMangaEden();
+            }
+
         }
 
     }
@@ -217,18 +249,32 @@ public class Favorites extends Fragment {
 
                     client = new MangaEdenClient();
 
-                    for(String s : map.keySet()) {
+                    if(download) {
 
-                        // Get list of manga
-                        MangaDetails details = client.getMangaDetails(s);
+                        for(AppUtil.MangaFile mf : mangaFiles) {
 
-                        Manga m = new Manga(details.getImage(), details.getTitle(), s, details.getAlias(), details.getStatus(), details.getCreated(), details.getHits());
+                            MangaDetails details = client.getMangaDetails(mf.getName());
 
-                        mangaList.add(m);
+                            Manga m = new Manga(details.getImage(), details.getTitle(), mf.getName(), details.getAlias(), details.getStatus(), details.getCreated(), details.getHits());
 
-                        //mangaList.addAll(mangaLists);
+                            mangaList.add(m);
 
-                        //Collections.sort(mangaArrayList, mangaSort(R.id.sort_title));
+                        }
+
+                    } else {
+
+                        for (String s : map.keySet()) {
+
+                            // Get list of manga
+                            MangaDetails details = client.getMangaDetails(s);
+
+                            Manga m = new Manga(details.getImage(), details.getTitle(), s, details.getAlias(), details.getStatus(), details.getCreated(), details.getHits());
+
+                            mangaList.add(m);
+
+                            //mangaList.addAll(mangaLists);
+
+                            //Collections.sort(mangaArrayList, mangaSort(R.id.sort_title));
 
                         /*for(int i=0;i<mangaArrayList.size();i++) {
                             Log.w("Line_"+new Throwable().getStackTrace()[0].getLineNumber(), mangaArrayList.get(i).getTitle());
@@ -251,6 +297,8 @@ public class Favorites extends Fragment {
                         Log.w("Line_"+new Throwable().getStackTrace()[0].getLineNumber(), imageUrl);
                         Log.e("Line_"+new Throwable().getStackTrace()[0].getLineNumber(), mangaList.toString());
                         */
+
+                        }
 
                     }
 

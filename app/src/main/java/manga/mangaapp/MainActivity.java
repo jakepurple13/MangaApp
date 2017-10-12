@@ -130,6 +130,8 @@ import co.hkm.soltag.LayouMode;
 import co.hkm.soltag.TagContainerLayout;
 import co.hkm.soltag.TagView;
 import info.guardianproject.netcipher.NetCipher;
+import io.kimo.konamicode.KonamiCode;
+import io.kimo.konamicode.KonamiCodeLayout;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import jp.wasabeef.recyclerview.adapters.SlideInLeftAnimationAdapter;
@@ -159,6 +161,7 @@ import pl.aprilapps.easyphotopicker.EasyImage;
 import programmer.box.utilityhelper.UtilAsyncTask;
 import programmer.box.utilityhelper.UtilDevice;
 import programmer.box.utilityhelper.UtilLog;
+import programmer.box.utilityhelper.UtilNotification;
 import rebus.bottomdialog.BottomDialog;
 import rebus.bottomdialog.Item;
 
@@ -216,7 +219,7 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
 
         String picture = SharedPreferencesManager.getInstance().getValue("profile_image", String.class);
 
-        profileDrawerItem = new ProfileDrawerItem().withName("You");
+        profileDrawerItem = new ProfileDrawerItem().withName(getString(R.string.you));
 
         if (picture == null) {
             profileDrawerItem.withIcon(MaterialDesignIconic.Icon.gmi_account);
@@ -247,8 +250,9 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
 
         searchBars.setNavButtonEnabled(true);
         searchBars.setSpeechMode(false);
-        searchBars.setHint("Search Here");
-        searchBars.setPlaceHolder("Search Here");
+        String searchHere = getString(R.string.search_here);
+        searchBars.setHint(searchHere);
+        searchBars.setPlaceHolder(searchHere);
 
         searchBars.addTextChangeListener(new TextWatcher() {
             @Override
@@ -596,9 +600,9 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
     public void newSource(final GenreTags.Sources tag) {
 
         LovelyProgressDialog lpd = new LovelyProgressDialog(this);
-        lpd.setMessage("Getting Manga");
+        lpd.setMessage(getString(R.string.getting_manga));
         lpd.setMessageGravity(Gravity.CENTER);
-        lpd.setTitle("Please Wait...");
+        lpd.setTitle(getString(R.string.please_wait));
         lpd.setTitleGravity(Gravity.CENTER);
 
         new RetrieveInfo(new AsyncTasks() {
@@ -707,10 +711,10 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
 
         if(currentUser!=null) {
             updateUI(currentUser);
-            logout.withName("Logout");
+            logout.withName(getString(R.string.logout));
             result.updateItem(logout);
         } else {
-            logout.withName("Login");
+            logout.withName(getString(R.string.login));
             result.updateItem(logout);
         }
 
@@ -997,7 +1001,7 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
 
                 String currentSource = currentSite == null ? "MangaEden" : currentSite.getName();
 
-                showChipDialog(android.R.drawable.ic_menu_search, "Current Source is " + currentSource, "Pick a new Source", GenreTags.getAllSources(), null, true, new TagView.OnTagClickListener() {
+                showChipDialog(android.R.drawable.ic_menu_search, getString(R.string.current_source, currentSource), "Pick a new Source", GenreTags.getAllSources(), null, true, new TagView.OnTagClickListener() {
                     @Override
                     public void onTagClick(int position, String text) {
 
@@ -1083,6 +1087,46 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
             }
         });
 
+        PrimaryDrawerItem cheatMode = new PrimaryDrawerItem().withIdentifier(900).withSelectable(false).withName("Cheat Mode").withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+            @Override
+            public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+
+                result.closeDrawer();
+
+                KonamiCode code = new KonamiCode.Installer(MainActivity.this)
+                        .on(MainActivity.this)
+                        .callback(new KonamiCodeLayout.Callback() {
+                            @Override
+                            public void onFinish() {
+                                UtilNotification.showToast(MainActivity.this, "Super Manga Mode Activated", Toast.LENGTH_LONG);
+                            }
+                        })
+                        .install();
+
+                return false;
+            }
+        });
+
+        PrimaryDrawerItem downloadedChapters = new PrimaryDrawerItem().withIdentifier(901).withSelectable(false).withName("View Downloaded Chapters").withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+            @Override
+            public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+
+                result.closeDrawer();
+
+                ArrayList<AppUtil.MangaFile> mangaFileArrayList = AppUtil.getDownloadedChapters(mangaArrayList);
+
+                for(AppUtil.MangaFile mf : mangaFileArrayList) {
+
+                    File f = new File(mf.directory);
+
+                    Help.w(f.isDirectory() + " is a directory and " + f.exists());
+                }
+
+                addFragment(Favorites.newInstance(MainActivity.this, mangaFileArrayList, true));
+
+                return false;
+            }
+        });
 
         logout = new PrimaryDrawerItem().withIdentifier(89).withSelectable(false).withName("Logout").withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
             @Override
@@ -1274,8 +1318,10 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
                         new DividerDrawerItem(),
                         home,
                         gotoFavorites,
+                        downloadedChapters,
                         new DividerDrawerItem(),
                         colorUse,
+                        cheatMode,
                         settings,
                         new DividerDrawerItem(),
                         logout
@@ -1559,7 +1605,7 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
 
     public void iosDialog(String source, final View.OnClickListener positive, final View.OnClickListener negative) {
         final iOSDialog dialog = new iOSDialog(MainActivity.this);
-        dialog.setTitle("Change source to " + source);
+        dialog.setTitle(getString(R.string.change_source, source));
         dialog.setSubtitle("Are you sure you want to change source?");
         dialog.setNegativeLabel("Never Mind");
         dialog.setPositiveLabel("Yes Please");

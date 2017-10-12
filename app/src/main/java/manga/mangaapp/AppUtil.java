@@ -24,11 +24,15 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import manga.mangaapp.mangaedenclient.Chapter;
 import manga.mangaapp.mangaedenclient.ChapterDetails;
 import manga.mangaapp.mangaedenclient.ChapterPage;
+import manga.mangaapp.mangaedenclient.Manga;
 import manga.mangaapp.mangaedenclient.MangaDetails;
 import manga.mangaapp.mangaedenclient.MangaEdenClient;
 import manga.mangaapp.manymanga.data.Image;
@@ -60,12 +64,12 @@ public class AppUtil {
 
     }
 
-    public static void downloadChapter(final Context context, final ChapterPage[] chapters, final String title, final int chapterNum, boolean b) {
+    public static void downloadChapter(final Context context, final ChapterPage[] chapters, final String title, final String mangaID, final int chapterNum, boolean b) {
 
         final LovelyProgressDialog lpd = new LovelyProgressDialog(context);
-        lpd.setMessage("Getting Manga");
+        lpd.setMessage(context.getString(R.string.getting_manga));
         lpd.setMessageGravity(Gravity.CENTER);
-        lpd.setTitle("Please Wait...");
+        lpd.setTitle(context.getString(R.string.please_wait_));
         lpd.setTitleGravity(Gravity.CENTER);
         lpd.setIcon(R.drawable.ic_menu_black_24dp);
 
@@ -88,7 +92,7 @@ public class AppUtil {
                     try {
                         url = new URL(String.valueOf(chapters[i].getImageURI()));
                         Bitmap image = BitmapFactory.decodeStream(url.openConnection().getInputStream());
-                        SaveImage(image, "MangaWorld/" + title + "/" + chapterNum, chapters[i].getNumber() + ".jpg");
+                        SaveImage(image, "MangaWorld/" + mangaID + "/" + chapterNum, chapters[i].getNumber() + ".jpg");
                         //Toast.makeText(context, "Downloaded Page: " + chapters[i].getNumber(), Toast.LENGTH_SHORT).show();
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -110,7 +114,9 @@ public class AppUtil {
                     UtilNotification.createNotificationGroup(context, "group_manga_id", "group_manga");
                 }
 
-                UtilNotification.sendNotification(context, android.R.mipmap.sym_def_app_icon, "Downloaded", title + " is downloaded", "manga_is_downloaded", MainActivity.class, 1);
+                String notifyUser = context.getString(R.string.manga_is_downloaded, title);
+
+                UtilNotification.sendNotification(context, android.R.mipmap.sym_def_app_icon, context.getString(R.string.downloaded), notifyUser, "manga_is_downloaded", MainActivity.class, 1);
 
             }
 
@@ -232,6 +238,103 @@ public class AppUtil {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static void getDownloadedChapters() {
+
+        String root = Environment.getExternalStorageDirectory().toString();
+
+        List<File> files = getListFiles(new File(root + "/MangaWorld"));
+        for(File f : files) {
+            Help.v(f.getName());
+        }
+
+    }
+
+    public static ArrayList<MangaFile> getDownloadedChapters(ArrayList<Manga> mangas) {
+
+        String root = Environment.getExternalStorageDirectory().toString();
+
+        List<File> files = getListFiles(new File(root + "/MangaWorld"));
+        /*for(File f : files) {
+            int num = getLocation(mangas, f);
+            Help.v(f.getName() + " and its around " + num);
+        }*/
+
+        ArrayList<MangaFile> mangaFileArrayList = new ArrayList<>();
+
+        for(int i=0;i<files.size()-1;i++) {
+            if(files.get(i+1).getParentFile().equals(files.get(i))) {
+                Help.v(files.get(i).getName() + " is the parent directory of " + files.get(i+1).getName());
+                mangaFileArrayList.add(new MangaFile(files.get(i).getName(), files.get(i+1).getPath()));
+            }
+        }
+
+        return mangaFileArrayList;
+
+    }
+
+    public static class MangaFile {
+
+        String name;
+        String directory;
+
+        public MangaFile(String name, String directory) {
+            this.name = name;
+            this.directory = directory;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getDirectory() {
+            return directory;
+        }
+    }
+
+    public static int getLocation(ArrayList<Manga> mangas, File f) {
+        int num = -1;
+
+        for(int i=0;i<mangas.size();i++) {
+            if(mangas.get(i).getTitle().equals(f.getName())) {
+                num = i;
+                break;
+            }
+        }
+
+        return num;
+    }
+
+    private static List<File> getListFiles(File parentDir) {
+        ArrayList<File> inFiles = new ArrayList<File>();
+        File[] files = parentDir.listFiles();
+        for (File file : files) {
+            if (file.isDirectory()) {
+                inFiles.add(file);
+                inFiles.addAll(getListFiles(file));
+            } else {
+                //if(file.getName().endsWith("")){
+                    //inFiles.add(file);
+                //}
+            }
+        }
+        return inFiles;
+    }
+
+    private static List<File> getImageFiles(File parentDir) {
+        ArrayList<File> inFiles = new ArrayList<File>();
+        File[] files = parentDir.listFiles();
+        for (File file : files) {
+            if (file.isDirectory()) {
+                inFiles.addAll(getListFiles(file));
+            } else {
+                if(file.getName().endsWith(".jpg")){
+                    inFiles.add(file);
+                }
+            }
+        }
+        return inFiles;
     }
 
     /**
