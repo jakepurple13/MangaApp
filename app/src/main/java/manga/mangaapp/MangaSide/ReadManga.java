@@ -304,7 +304,7 @@ public class ReadManga extends AppCompatActivity {
 
                 pagePost.postExecute();
 
-                PagerAdapter adapter = new MangaPage(pages, ReadManga.this, new View.OnClickListener() {
+                PagerAdapter adapter = new MangaPage(pages, viewPager, ReadManga.this, new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         getPages(chapterID, pagePost);

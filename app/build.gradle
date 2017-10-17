@@ -122,6 +122,8 @@ dependencies {
 
     compile "commons-io:commons-io:2.5"
 
+    compile 'com.alexvasilkov:gesture-views:2.3.2'
+
     //compile 'com.github.material-foundation.material-remixer-android:remixer:1.0'
     //provided 'com.github.material-foundation.material-remixer-android:remixer_annotation:1.0'
 
