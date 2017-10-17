@@ -120,6 +120,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
@@ -1113,14 +1114,16 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
 
                 result.closeDrawer();
 
-                ArrayList<AppUtil.MangaFile> mangaFileArrayList = AppUtil.getDownloadedChapters(mangaArrayList);
+                /*ArrayList<AppUtil.MangaFile> mangaFileArrayList = AppUtil.getDownloadedChapters(mangaArrayList);
 
                 for(AppUtil.MangaFile mf : mangaFileArrayList) {
 
                     File f = new File(mf.directory);
 
                     Help.w(f.isDirectory() + " is a directory and " + f.exists());
-                }
+                }*/
+
+                HashMap<String, AppUtil.MangaListFile> mangaFileArrayList = AppUtil.getDownloadedChapters(true);
 
                 addFragment(Favorites.newInstance(MainActivity.this, mangaFileArrayList, true));
 

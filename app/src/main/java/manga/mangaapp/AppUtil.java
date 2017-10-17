@@ -27,7 +27,10 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import manga.mangaapp.mangaedenclient.Chapter;
 import manga.mangaapp.mangaedenclient.ChapterDetails;
@@ -92,7 +95,8 @@ public class AppUtil {
                     try {
                         url = new URL(String.valueOf(chapters[i].getImageURI()));
                         Bitmap image = BitmapFactory.decodeStream(url.openConnection().getInputStream());
-                        SaveImage(image, "MangaWorld/" + mangaID + "/" + chapterNum, chapters[i].getNumber() + ".jpg");
+                        //SaveImage(image, "MangaWorld/" + mangaID + "/" + chapterNum, chapters[i].getNumber() + ".jpg");
+                        SaveImage(image, "MangaWorld/" + title + "/" + chapterNum, chapters[i].getNumber() + ".jpg");
                         //Toast.makeText(context, "Downloaded Page: " + chapters[i].getNumber(), Toast.LENGTH_SHORT).show();
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -251,7 +255,11 @@ public class AppUtil {
 
     }
 
-    public static ArrayList<MangaFile> getDownloadedChapters(ArrayList<Manga> mangas) {
+    public static MangaListFile getMangaFromDownloads(String key) {
+        return getDownloadedChapters(true).get(key);
+    }
+
+    public static HashMap<String, MangaListFile> getDownloadedChapters(boolean choose/*ArrayList<Manga> mangas*/) {
 
         String root = Environment.getExternalStorageDirectory().toString();
 
@@ -263,15 +271,49 @@ public class AppUtil {
 
         ArrayList<MangaFile> mangaFileArrayList = new ArrayList<>();
 
+        HashMap<String, MangaListFile> map = new HashMap<>();
+
         for(int i=0;i<files.size()-1;i++) {
             if(files.get(i+1).getParentFile().equals(files.get(i))) {
                 Help.v(files.get(i).getName() + " is the parent directory of " + files.get(i+1).getName());
-                mangaFileArrayList.add(new MangaFile(files.get(i).getName(), files.get(i+1).getPath()));
+
+                String name = files.get(i).getName();
+                String path = files.get(i+1).getPath();
+                MangaFile file = new MangaFile(name, path);
+
+                if(!map.containsKey(name)) {
+                    map.put(name, new MangaListFile(name));
+                } else {
+                    map.get(name).addFile(file);
+                }
+
+                mangaFileArrayList.add(file);
             }
         }
 
-        return mangaFileArrayList;
+        return map;
 
+    }
+
+    public static class MangaListFile {
+        String name;
+        ArrayList<MangaFile> files;
+
+        public MangaListFile(String name) {
+            files = new ArrayList<>();
+        }
+
+        public void addFile(MangaFile file) {
+            files.add(file);
+        }
+
+        public ArrayList<MangaFile> getFiles() {
+            return files;
+        }
+
+        public String getName() {
+            return name;
+        }
     }
 
     public static class MangaFile {
@@ -290,6 +332,11 @@ public class AppUtil {
 
         public String getDirectory() {
             return directory;
+        }
+
+        @Override
+        public String toString() {
+            return name + ": " + directory;
         }
     }
 

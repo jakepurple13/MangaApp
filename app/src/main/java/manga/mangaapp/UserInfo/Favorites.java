@@ -53,6 +53,8 @@ public class Favorites extends Fragment {
 
     ArrayList<Manga> mangaList;
 
+    HashMap<String, AppUtil.MangaListFile> mangaFileList;
+
     Activity a;
 
     boolean download = false;
@@ -77,6 +79,13 @@ public class Favorites extends Fragment {
         this.download = download;
     }
 
+    @SuppressLint("ValidFragment")
+    public Favorites(Activity a, HashMap<String, AppUtil.MangaListFile> mangaFiles, boolean download) {
+        // Required empty public constructor
+        this.a = a;
+        this.mangaFileList = mangaFiles;
+        this.download = download;
+    }
 
     // TODO: Rename and change types and number of parameters
     public static Favorites newInstance(Activity activity) {
@@ -86,6 +95,12 @@ public class Favorites extends Fragment {
 
     // TODO: Rename and change types and number of parameters
     public static Favorites newInstance(Activity activity, ArrayList<AppUtil.MangaFile> mangaFiles, boolean download) {
+        Favorites fragment = new Favorites(activity, mangaFiles, download);
+        return fragment;
+    }
+
+    // TODO: Rename and change types and number of parameters
+    public static Favorites newInstance(Activity activity, HashMap<String, AppUtil.MangaListFile> mangaFiles, boolean download) {
         Favorites fragment = new Favorites(activity, mangaFiles, download);
         return fragment;
     }
@@ -115,7 +130,8 @@ public class Favorites extends Fragment {
 
             if(download) {
 
-                getMangaEden();
+                //getMangaEden();
+                getDownloaded();
 
             } else {
 
@@ -129,6 +145,9 @@ public class Favorites extends Fragment {
 
             if(download) {
                 getMangaEden();
+            } else {
+                //local
+                getDownloaded();
             }
 
         }
@@ -142,6 +161,18 @@ public class Favorites extends Fragment {
         return inflater.inflate(R.layout.activity_favorites, container, false);
     }
 
+    public void getDownloaded () {
+
+        //mAdapter = new DownloadAdapter(mangaFileList);
+
+        ArrayList<String> keys = new ArrayList<>();
+
+        keys.addAll(mangaFileList.keySet());
+
+        mAdapter = new DownloadAdapter(this.getActivity(), keys, mangaFileList);
+        mRecyclerView.setAdapter(mAdapter);
+
+    }
 
     public void getFavorites() {
 

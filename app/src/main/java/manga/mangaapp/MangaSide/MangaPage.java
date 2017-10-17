@@ -84,6 +84,9 @@ public class MangaPage extends PagerAdapter {
 
             iv.getController().enableScrollInViewPager(viewPager);
 
+            iv.getPositionAnimator().enter(true);
+            iv.getPositionAnimator().exit(true);
+
             iv.getController().setOnGesturesListener(new GestureController.OnGestureListener() {
                 @Override
                 public void onDown(@NonNull MotionEvent event) {
