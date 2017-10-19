@@ -164,6 +164,9 @@ public class ChapterListAdapter extends RecyclerView.Adapter<ChapterListAdapter.
                 lpd.setTitleGravity(Gravity.CENTER);
 
                 new RetrieveInfo(new AsyncTasks() {
+
+                    String coverURL = "";
+
                     @Override
                     public void onPreExecute() {
 
@@ -174,6 +177,7 @@ public class ChapterListAdapter extends RecyclerView.Adapter<ChapterListAdapter.
 
                         try {
                             images = client.getChapterDetails(mDataset[position].getId()).getPages();
+                            coverURL = client.getMangaDetails(mangaID).getImage();
                             //AppUtil.downloadChapter(in, , mangaTitle, mDataset[position].getNumber());
                         } catch (IOException e) {
                             e.printStackTrace();
@@ -185,7 +189,7 @@ public class ChapterListAdapter extends RecyclerView.Adapter<ChapterListAdapter.
                     @Override
                     public void onPostExecute(Boolean success) {
 
-                        AppUtil.downloadChapter(in, images, mangaTitle, mangaID, mDataset[position].getNumber(), true);
+                        AppUtil.downloadChapter(in, coverURL, images, mangaTitle, mangaID, mDataset[position].getNumber(), true);
 
                     }
                 }).execute();
@@ -195,7 +199,7 @@ public class ChapterListAdapter extends RecyclerView.Adapter<ChapterListAdapter.
         
         final String downloadChapterString = in.getResources().getString(R.string.download_chapter);
 
-        downloadChapter.setOnLongClickListener(new View.OnLongClickListener() {
+        View.OnLongClickListener longClickListener = new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(final View v) {
                 UtilNotification.showMenu(v.getContext(), v, new PopupMenu.OnMenuItemClickListener() {
@@ -210,58 +214,15 @@ public class ChapterListAdapter extends RecyclerView.Adapter<ChapterListAdapter.
                 }, downloadChapterString);
                 return true;
             }
-        });
+        };
 
-        tv.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(final View v) {
-                UtilNotification.showMenu(v.getContext(), v, new PopupMenu.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-                        if(item.getTitle().equals(downloadChapterString)) {
-                            v.callOnClick();
-                            return true;
-                        }
-                        return false;
-                    }
-                }, downloadChapterString);
-                return true;
-            }
-        });
+        downloadChapter.setOnLongClickListener(longClickListener);
 
-        ib.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(final View v) {
-                UtilNotification.showMenu(v.getContext(), v, new PopupMenu.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-                        if(item.getTitle().equals(downloadChapterString)) {
-                            v.callOnClick();
-                            return true;
-                        }
-                        return false;
-                    }
-                }, downloadChapterString);
-                return true;
-            }
-        });
+        tv.setOnLongClickListener(longClickListener);
 
-        layout.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(final View v) {
-                UtilNotification.showMenu(v.getContext(), v, new PopupMenu.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-                        if(item.getTitle().equals(downloadChapterString)) {
-                            v.callOnClick();
-                            return true;
-                        }
-                        return false;
-                    }
-                }, downloadChapterString);
-                return true;
-            }
-        });
+        ib.setOnLongClickListener(longClickListener);
+
+        layout.setOnLongClickListener(longClickListener);
 
     }
 

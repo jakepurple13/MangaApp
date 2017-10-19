@@ -37,6 +37,7 @@ import manga.mangaapp.mangaedenclient.ChapterDetails;
 import manga.mangaapp.mangaedenclient.ChapterPage;
 import manga.mangaapp.mangaedenclient.Manga;
 import manga.mangaapp.mangaedenclient.MangaDetails;
+import manga.mangaapp.mangaedenclient.MangaEden;
 import manga.mangaapp.mangaedenclient.MangaEdenClient;
 import manga.mangaapp.manymanga.data.Image;
 import programmer.box.utilityhelper.UtilNotification;
@@ -67,7 +68,7 @@ public class AppUtil {
 
     }
 
-    public static void downloadChapter(final Context context, final ChapterPage[] chapters, final String title, final String mangaID, final int chapterNum, boolean b) {
+    public static void downloadChapter(final Context context, final String coverURL, final ChapterPage[] chapters, final String title, final String mangaID, final int chapterNum, boolean b) {
 
         final LovelyProgressDialog lpd = new LovelyProgressDialog(context);
         lpd.setMessage(context.getString(R.string.getting_manga));
@@ -88,6 +89,14 @@ public class AppUtil {
             protected Boolean doInBackground(Void... voids) {
 
                 Help.d(chapters.length + " pages");
+
+                try {
+                    URL url1 = new URL(String.valueOf(MangaEden.manga2ImageURI(coverURL)));//new URL(coverURL);
+                    Bitmap image1 = BitmapFactory.decodeStream(url1.openConnection().getInputStream());
+                    SaveImage(image1, "MangaWorld/" + title + "/" + chapterNum, "cover.jpg");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 
                 for (int i = 0; i < chapters.length; i++) {
 
@@ -259,17 +268,31 @@ public class AppUtil {
         return getDownloadedChapters(true).get(key);
     }
 
+    public static File[] getMangaChapters() {
+        String root = Environment.getExternalStorageDirectory().toString();
+        List<File> imageFile = getImageFiles(new File(root + "/MangaWorld"));
+
+        for(File f : imageFile) {
+            //int num = getLocation(mangas, f);
+            Help.v(f.getName());
+        }
+        return imageFile.get(0).listFiles();
+    }
+
     public static HashMap<String, MangaListFile> getDownloadedChapters(boolean choose/*ArrayList<Manga> mangas*/) {
 
         String root = Environment.getExternalStorageDirectory().toString();
 
-        List<File> files = getListFiles(new File(root + "/MangaWorld"));
-        /*for(File f : files) {
-            int num = getLocation(mangas, f);
-            Help.v(f.getName() + " and its around " + num);
-        }*/
+        //List<File> files = getListFiles(new File(root + "/MangaWorld"));
+        List<File> files = getImageFiles(new File(root + "/MangaWorld"));
 
-        ArrayList<MangaFile> mangaFileArrayList = new ArrayList<>();
+        for(File f : files) {
+            //int num = getLocation(mangas, f);
+            Help.v(f.getName());
+        }
+        /*
+        File[] filed = imageFile.get(0).listFiles();*/
+        //ArrayList<MangaFile> mangaFileArrayList = new ArrayList<>();
 
         HashMap<String, MangaListFile> map = new HashMap<>();
 
@@ -282,12 +305,16 @@ public class AppUtil {
                 MangaFile file = new MangaFile(name, path);
 
                 if(!map.containsKey(name)) {
+                    //if its not here
                     map.put(name, new MangaListFile(name));
+                    Help.e(name + " is now here");
                 } else {
+                    //if it is here
                     map.get(name).addFile(file);
+                    Help.e(name + " is still here");
                 }
 
-                mangaFileArrayList.add(file);
+                //mangaFileArrayList.add(file);
             }
         }
 
@@ -297,10 +324,26 @@ public class AppUtil {
 
     public static class MangaListFile {
         String name;
+        String cover;
         ArrayList<MangaFile> files;
 
         public MangaListFile(String name) {
+            this.name = name;
             files = new ArrayList<>();
+        }
+
+        public MangaListFile(String name, String cover) {
+            this.name = name;
+            this.cover = cover;
+            files = new ArrayList<>();
+        }
+
+        public void setCover(String cover) {
+            this.cover = cover;
+        }
+
+        public String getCover() {
+            return cover;
         }
 
         public void addFile(MangaFile file) {

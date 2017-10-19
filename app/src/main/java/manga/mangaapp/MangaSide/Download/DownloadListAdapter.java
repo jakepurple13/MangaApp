@@ -1,4 +1,4 @@
-package manga.mangaapp.UserInfo;
+package manga.mangaapp.MangaSide.Download;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -6,37 +6,24 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Set;
-
 import manga.mangaapp.AppUtil;
-import manga.mangaapp.Layouts;
-import manga.mangaapp.MainActivity;
-import manga.mangaapp.MangaAdapter;
-import manga.mangaapp.MangaSide.Download.DownloadInfoActivity;
 import manga.mangaapp.R;
 
 /**
  * Created by Jacob on 10/17/17.
  */
 
-public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.ViewHolder> {
+public class DownloadListAdapter extends RecyclerView.Adapter<DownloadListAdapter.ViewHolder> {
 
-    HashMap<String, AppUtil.MangaListFile> mangaFiles;
-
-    ArrayList<String> keys;
+    AppUtil.MangaListFile mangaFiles;
 
     Activity in;
 
-    public DownloadAdapter(Activity in, ArrayList<String> keys, HashMap<String, AppUtil.MangaListFile> mangaFiles) {
+    public DownloadListAdapter(Activity in, AppUtil.MangaListFile mangaFiles) {
         this.mangaFiles = mangaFiles;
-        this.keys = keys;
         this.in = in;
     }
 
@@ -55,7 +42,7 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.ViewHo
     }
 
     @Override
-    public DownloadAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public DownloadListAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.downloaded_chapter_layout, parent, false);
         ViewHolder vh = new ViewHolder(v);
@@ -64,22 +51,19 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        final String name = keys.get(position);
+
         TextView title = holder.title;
-        title.setText(name);
+
+        title.setText(mangaFiles.getName());
 
         TextView chapList = holder.chapNum;
 
-        String list = mangaFiles.get(keys.get(position)).getFiles().toString();
-
-        chapList.setText(list);
+        chapList.setText(mangaFiles.getFiles().get(position).getName());
 
         holder.layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(in, DownloadInfoActivity.class);
-                i.putExtra("download_manga_title", name);
-                in.startActivity(i);
+
             }
         });
 
@@ -87,7 +71,7 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.ViewHo
 
     @Override
     public int getItemCount() {
-        return keys.size();
+        return mangaFiles.getFiles().size();
     }
 
 }

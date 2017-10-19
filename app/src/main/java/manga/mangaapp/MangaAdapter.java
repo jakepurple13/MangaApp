@@ -170,10 +170,16 @@ public class MangaAdapter extends RecyclerView.Adapter<MangaAdapter.ViewHolder>{
                         // Get chapter page image URLs
                         //final URI imageUrl = pages[0].getImageURI();
                         final URI imageUrl = MangaEden.manga2ImageURI(mangaDetails.getImage());
-                        final Palette p = UtilImage.getPalatteFromUrl(String.valueOf(imageUrl));
+                        Palette p;
+                        try {
+                            p = UtilImage.getPalatteFromUrl(String.valueOf(imageUrl));
+                        } catch(IllegalArgumentException e) {
+                            p = null;
+                        }
                         //final String detail = "Chapter Count: " + chapters.length+"\n\n"+mangaDetails.getDescription();
                         final String detail = mangaDetails.getDescription();
                         Handler uiHandler = new Handler(Looper.getMainLooper());
+                        final Palette finalP = p;
                         uiHandler.post(new Runnable() {
                             @Override
                             public void run() {
@@ -202,41 +208,47 @@ public class MangaAdapter extends RecyclerView.Adapter<MangaAdapter.ViewHolder>{
 
                                 if(mangaDetails.getImage()!=null && SharedPreferencesManager.getInstance().getValue("manga_color", Boolean.class, true)) {
 
-                                    int light = p.getLightVibrantColor(in.getColor(R.color.white));
-                                    int dark = p.getDarkVibrantColor(in.getColor(R.color.md_black_1000));
+                                    try {
 
-                                    String hex = "#" + Integer.toHexString(light).substring(2);
-                                    if(hex.trim().toLowerCase().matches("#(f[5-9|a-f]){3}")) {
-                                        tv.setTextColor(light);
-                                        holder.chapterCount.setTextColor(light);
-                                        light = dark;
+                                        int light = finalP.getLightVibrantColor(in.getColor(R.color.white));
+                                        int dark = finalP.getDarkVibrantColor(in.getColor(R.color.md_black_1000));
+
+                                        String hex = "#" + Integer.toHexString(light).substring(2);
+                                        if (hex.trim().toLowerCase().matches("#(f[5-9|a-f]){3}")) {
+                                            tv.setTextColor(light);
+                                            holder.chapterCount.setTextColor(light);
+                                            light = dark;
+                                        }
+
+                                        //tv.setTextColor(dark);
+                                        tv.setBackgroundColor(light);
+
+                                        if (layoutType.equals(Layouts.DETAILS)) {
+                                            //holder.summary.setTextColor(dark);
+                                            //holder.chapterCount.setBackgroundColor(p.getLightMutedColor(in.getColor(R.color.md_black_1000)));
+                                            //holder.chapterCount.setBackgroundColor(p.getDarkMutedColor(in.getColor(R.color.md_black_1000)));
+                                            //holder.chapterCount.setBackgroundColor(p.getVibrantColor(in.getColor(R.color.white)));
+                                            holder.chapterCount.setBackgroundColor(AppUtil.lighter(light, 0.5f));
+                                            holder.summary.setBackgroundColor(in.getColor(R.color.white));
+                                        }
+
+                                        int[] colors = {in.getColor(R.color.white), light, in.getColor(R.color.white)};
+
+                                        //create a new gradient color
+                                        GradientDrawable gd = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, colors);
+
+                                        //ib.setBackgroundColor(light);
+
+
+                                        //gd.setCornerRadius(0f);
+                                        //apply the button background to newly created drawable gradient
+                                        //holder.layout.setBackground(gd);
+
+                                        holder.layout.setBackgroundColor(light);
+
+                                    } catch(NullPointerException e) {
+                                        Help.e(e.getLocalizedMessage());
                                     }
-
-                                    //tv.setTextColor(dark);
-                                    tv.setBackgroundColor(light);
-
-                                    if(layoutType.equals(Layouts.DETAILS)) {
-                                        //holder.summary.setTextColor(dark);
-                                        //holder.chapterCount.setBackgroundColor(p.getLightMutedColor(in.getColor(R.color.md_black_1000)));
-                                        //holder.chapterCount.setBackgroundColor(p.getDarkMutedColor(in.getColor(R.color.md_black_1000)));
-                                        //holder.chapterCount.setBackgroundColor(p.getVibrantColor(in.getColor(R.color.white)));
-                                        holder.chapterCount.setBackgroundColor(AppUtil.lighter(light, 0.5f));
-                                        holder.summary.setBackgroundColor(in.getColor(R.color.white));
-                                    }
-
-                                    int[] colors = {in.getColor(R.color.white), light, in.getColor(R.color.white)};
-
-                                    //create a new gradient color
-                                    GradientDrawable gd = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, colors);
-
-                                    //ib.setBackgroundColor(light);
-
-
-                                    //gd.setCornerRadius(0f);
-                                    //apply the button background to newly created drawable gradient
-                                    //holder.layout.setBackground(gd);
-
-                                    holder.layout.setBackgroundColor(light);
                                 }
 
                                 Help.e("IB STUFF", ib.getDrawable().getBounds().flattenToString());

@@ -142,7 +142,8 @@
 
         <activity
             android:name=".Settings.SettingsActivity"
-            android:label="@string/title_activity_settings"></activity>
+            android:label="@string/title_activity_settings" />
+        <activity android:name=".MangaSide.Download.DownloadInfoActivity"></activity>
     </application>
 
 </manifest>

@@ -6,7 +6,19 @@
     android:clipToPadding="true"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="manga.mangaapp.MainActivity">
+
+    <android.support.design.widget.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        app:useCompatPadding="true"
+        app:borderWidth="1dp"
+        android:src="@drawable/random"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:id="@+id/switch_source"/>
 
     <LinearLayout
         android:id="@+id/container_frags"
@@ -31,15 +43,8 @@
         android:layout_height="match_parent"
         android:layout_above="@+id/site_link"
         android:layout_below="@id/searchBar"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
         android:layout_alignParentStart="true" />
-
-    <android.support.design.widget.FloatingActionButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:visibility="gone"
-        android:id="@+id/switch_source"/>
 
     <TextView
         android:id="@+id/site_link"

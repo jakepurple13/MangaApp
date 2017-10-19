@@ -122,6 +122,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 
@@ -139,6 +140,7 @@ import jp.wasabeef.recyclerview.adapters.SlideInLeftAnimationAdapter;
 import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
 import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
 import manga.mangaapp.MangaSide.GenreTags;
+import manga.mangaapp.MangaSide.MangaInfoActivity;
 import manga.mangaapp.UserInfo.Favorites;
 import manga.mangaapp.mangaedenclient.Manga;
 import manga.mangaapp.mangaedenclient.MangaDetails;
@@ -387,34 +389,20 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                /*if(chosen) {
-                    if(comicDone) {
-                        Collections.sort(comicsDtos, new ComicCompare());
-                        //set the adapter for real time searching
-                        mAdapter = new ComicAdapter(comicsDtos, MainActivity.this);
-                        mRecyclerView.setAdapter(mAdapter);
-                    }
-                } else {
-                    if(mangaDone) {
-                        Collections.sort(mangaArrayList, new MangaCompare());
-                        //set the adapter for real time searching
-                        mAdapter = new MangaAdapter(mangaArrayList, MainActivity.this, client);
-                        mRecyclerView.setAdapter(mAdapter);
-                    }
-                }*/
-                chosen = !chosen;
 
-                /*showChipDialog("Choose a Genre", "Pick as Many as you Want", GenreTags.getAllTags(), new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
+                Random gen = new Random();
 
-                    }
-                });*/
+                Manga m = mangaArrayList.get(gen.nextInt(mangaArrayList.size()-1));
+
+                Intent i = new Intent(MainActivity.this, MangaInfoActivity.class);
+                i.putExtra("manga_id", m.getId());
+                i.putExtra("manga_downloaded", false);
+                startActivity(i);
 
             }
         });
 
-        fab.setVisibility(View.GONE);
+        //fab.setVisibility(View.GONE);
 
         //initialize and create the image loader logic
         DrawerImageLoader.init(new AbstractDrawerImageLoader() {
