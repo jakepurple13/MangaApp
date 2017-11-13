@@ -206,7 +206,7 @@ public class MangaAdapter extends RecyclerView.Adapter<MangaAdapter.ViewHolder>{
                                         .placeholder(android.R.mipmap.sym_def_app_icon)
                                         .into(ib);
 
-                                if(mangaDetails.getImage()!=null && SharedPreferencesManager.getInstance().getValue("manga_color", Boolean.class, true)) {
+                                if((mangaDetails.getImage()!=null && finalP != null) && SharedPreferencesManager.getInstance().getValue("manga_color", Boolean.class, true)) {
 
                                     try {
 

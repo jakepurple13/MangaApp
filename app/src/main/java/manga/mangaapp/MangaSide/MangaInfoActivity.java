@@ -241,7 +241,7 @@ public class MangaInfoActivity extends AppCompatActivity {
                         URL url_value = new URL(String.valueOf(imageUrl));
                         Bitmap mIcon1 = BitmapFactory.decodeStream(url_value.openConnection().getInputStream());
                         p = Palette.from(mIcon1).generate();
-                    } catch (IOException e) {
+                    } catch (IOException | IllegalArgumentException e) {
                         e.printStackTrace();
                         Help.w("Didn't get it!");
                         p = null;
@@ -277,7 +277,7 @@ public class MangaInfoActivity extends AppCompatActivity {
                 });
 
                 //if(p!=null) {
-                if(mangaDetails.getImage()!=null && SharedPreferencesManager.getInstance().getValue("manga_color", Boolean.class, true)) {
+                if(mangaDetails.getImage()!=null && p!=null && SharedPreferencesManager.getInstance().getValue("manga_color", Boolean.class, true)) {
 
                     int vibrantColor = p.getLightVibrantColor(getColor(R.color.white));
                     int darkVibrant = p.getDarkVibrantColor(getColor(R.color.md_black_1000));

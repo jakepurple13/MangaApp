@@ -146,7 +146,11 @@ public class ReadManga extends AppCompatActivity {
             @Override
             public void onProgressChanged(DiscreteSeekBar seekBar, int value, boolean fromUser) {
                 viewPager.setCurrentItem(value);
-                pageCount.setText((value+1)+"/"+pages.length);
+                try {
+                    pageCount.setText((value + 1) + "/" + pages.length);
+                } catch(NullPointerException e) {
+                    pageCount.setText((value + 1));
+                }
                 //h.removeCallbacks(hideMenu); // cancel the running action (the hiding process)
                 //h.postDelayed(hideMenu, DELAY_AMOUNT); // start a new hiding process that will trigger after 5 seconds
             }
@@ -293,8 +297,9 @@ public class ReadManga extends AppCompatActivity {
                     ChapterDetails chapters = client.getChapterDetails(chapterID);
                     pages = chapters.getPages();
                     Help.e(Arrays.toString(pages));
-                } catch (IOException e) {
+                } catch (/*IOException | */Exception e) {
                     e.printStackTrace();
+                    return false;
                 }
                 return true;
             }
@@ -302,24 +307,30 @@ public class ReadManga extends AppCompatActivity {
             @Override
             public void onPostExecute(Boolean success) {
 
-                pagePost.postExecute();
+                if(success) {
 
-                PagerAdapter adapter = new MangaPage(pages, viewPager, ReadManga.this, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        getPages(chapterID, pagePost);
-                    }
-                }, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        if(isMenuShowing) {
-                            revealLayout.revealMainView();
-                        } else {
-                            revealLayout.revealSecondaryView();
+                    pagePost.postExecute();
+
+                    PagerAdapter adapter = new MangaPage(pages, viewPager, ReadManga.this, new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            getPages(chapterID, pagePost);
                         }
-                    }
-                });
-                viewPager.setAdapter(adapter);
+                    }, new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            if (isMenuShowing) {
+                                revealLayout.revealMainView();
+                            } else {
+                                revealLayout.revealSecondaryView();
+                            }
+                        }
+                    });
+                    viewPager.setAdapter(adapter);
+
+                } else {
+                    finish();
+                }
             }
         }).execute();
     }

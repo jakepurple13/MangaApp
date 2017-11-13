@@ -58,6 +58,8 @@ import com.adroitandroid.chipcloud.ChipCloud;
 import com.adroitandroid.chipcloud.ChipListener;
 import com.cleveroad.fanlayoutmanager.FanLayoutManager;
 import com.cleveroad.fanlayoutmanager.FanLayoutManagerSettings;
+import com.crashlytics.android.answers.Answers;
+import com.crashlytics.android.answers.ContentViewEvent;
 import com.forcelain.awesomelayoutmanager.AwesomeLayoutManager;
 import com.gdacciaro.iOSDialog.iOSDialog;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -132,6 +134,7 @@ import co.hkm.soltag.LayouMode;
 import co.hkm.soltag.TagContainerLayout;
 import co.hkm.soltag.TagView;
 import info.guardianproject.netcipher.NetCipher;
+import io.fabric.sdk.android.Fabric;
 import io.kimo.konamicode.KonamiCode;
 import io.kimo.konamicode.KonamiCodeLayout;
 import io.reactivex.disposables.Disposable;
@@ -268,7 +271,7 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
 
                 Help.v(currentSource.source);
 
-                if(currentSource.equals(GenreTags.Sources.MANGAEDEN)) {
+                if (currentSource.equals(GenreTags.Sources.MANGAEDEN)) {
 
                     //All this is to search
                     mangaSearch.clear();
@@ -365,7 +368,7 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
             public void onButtonClicked(int buttonCode) {
                 searchBars.hideSuggestionsList();
                 Help.v("Button code: " + buttonCode);
-                switch (buttonCode){
+                switch (buttonCode) {
                     case MaterialSearchBar.BUTTON_NAVIGATION:
                         result.openDrawer();
                         Help.v("Button Nav");
@@ -392,7 +395,7 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
 
                 Random gen = new Random();
 
-                Manga m = mangaArrayList.get(gen.nextInt(mangaArrayList.size()-1));
+                Manga m = mangaArrayList.get(gen.nextInt(mangaArrayList.size() - 1));
 
                 Intent i = new Intent(MainActivity.this, MangaInfoActivity.class);
                 i.putExtra("manga_id", m.getId());
@@ -448,7 +451,6 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
                 .show(this);*/
 
     }
-
 
 
     public void getMangaEden() {
@@ -653,7 +655,7 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
                     getMangaEden();
                 } else {
                     try {
-                        Help.e(currentSite.getMangaList().size()+" manga titles");
+                        Help.e(currentSite.getMangaList().size() + " manga titles");
                         mangaList = new ArrayList<>();
                         mangaList.addAll(currentSite.getMangaList());
 
@@ -698,7 +700,7 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
 
-        if(currentUser!=null) {
+        if (currentUser != null) {
             updateUI(currentUser);
             logout.withName(getString(R.string.logout));
             result.updateItem(logout);
@@ -953,7 +955,7 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
                     @Override
                     public boolean onProfileImageClick(View view, IProfile profile, boolean current) {
 
-                        if(mAuth.getCurrentUser()==null) {
+                        if (mAuth.getCurrentUser() == null) {
 
                             login();
 
@@ -1123,7 +1125,7 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
             @Override
             public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
 
-                if(mAuth.getCurrentUser()!=null) {
+                if (mAuth.getCurrentUser() != null) {
                     mAuth.signOut();
                 } else {
                     login();
@@ -1342,7 +1344,7 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
 
         FragmentManager manager = getFragmentManager();
         FragmentTransaction transaction = manager.beginTransaction();
-        transaction.add(R.id.container_frags,fragment);
+        transaction.add(R.id.container_frags, fragment);
         transaction.addToBackStack(null);
         transaction.commit();
 
@@ -1362,13 +1364,13 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
         //getFragmentManager().beginTransaction().remove(getFragmentManager().findFragmentById(R.id.container_frags)).commit();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            for(Fragment fragment : getFragmentManager().getFragments()) {
+            for (Fragment fragment : getFragmentManager().getFragments()) {
 
                 getFragmentManager().beginTransaction().remove(fragment).commit();
 
             }
         } else {
-            for(android.support.v4.app.Fragment fragment : getSupportFragmentManager().getFragments()){
+            for (android.support.v4.app.Fragment fragment : getSupportFragmentManager().getFragments()) {
 
                 getSupportFragmentManager().beginTransaction().remove(fragment).commit();
 
@@ -1385,7 +1387,7 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
     public void replaceFragment(Fragment fragment) {
         FragmentManager manager = getFragmentManager();
         FragmentTransaction transaction = manager.beginTransaction();
-        transaction.replace(R.id.container_frags,fragment);
+        transaction.replace(R.id.container_frags, fragment);
         transaction.addToBackStack(null);
         transaction.commit();
     }
@@ -1433,7 +1435,7 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
                     @Override
                     public void onTagClick(int position, String text) {
                         Help.w(text);
-                        if(tagsChosen.contains(text)) {
+                        if (tagsChosen.contains(text)) {
                             tagsChosen.remove(text);
                         } else {
                             tagsChosen.add(text);
@@ -1483,9 +1485,9 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
                                 MangaDetails mangaDetails = client.getMangaDetails(mangaArrayList.get(i).getId());
                                 //Help.w(mangaDetails.getTitle(), Arrays.toString(mangaDetails.getCategories()));
                                 boolean add = true;
-                                for(String s : mTagContainerLayout.getSelectedItems()) {
+                                for (String s : mTagContainerLayout.getSelectedItems()) {
 
-                                    if(!Arrays.toString(mangaDetails.getCategories()).contains(s)) {
+                                    if (!Arrays.toString(mangaDetails.getCategories()).contains(s)) {
 
                                         /*Handler uiHandler = new Handler(Looper.getMainLooper());
                                         uiHandler.post(new Runnable() {
@@ -1499,7 +1501,7 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
                                     }
                                 }
 
-                                if(add) {
+                                if (add) {
                                     Help.w(mangaDetails.getTitle(), Arrays.toString(mangaDetails.getCategories()));
                                     alm.add(mangaArrayList.get(i));
                                     Handler handler = MainActivity.this.getWindow().getDecorView().getHandler();
@@ -1537,7 +1539,7 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
 
     public void sortManga(int id) {
 
-        if(id==R.id.sort_random) {
+        if (id == R.id.sort_random) {
             Collections.shuffle(mangaArrayList);
         } else {
             Comparator<Manga> sorter = mangaSort(id);
@@ -1621,7 +1623,7 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
     @Override
     public void onBackPressed() {
 
-        if(showFav) {
+        if (showFav) {
             removeFragment();
         }
 
@@ -1639,7 +1641,7 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
 
         Help.w("Request code: " + requestCode, "Result code: " + resultCode);
 
-        if(requestCode==EasyImage.REQ_SOURCE_CHOOSER) {
+        if (requestCode == EasyImage.REQ_SOURCE_CHOOSER) {
 
             EasyImage.handleActivityResult(requestCode, resultCode, data, this, new DefaultCallback() {
                 @Override
@@ -1659,7 +1661,7 @@ public class MainActivity extends AppCompatActivity implements Gota.OnRequestPer
                 }
             });
 
-        } else if(requestCode==REQUEST_CROP) {
+        } else if (requestCode == REQUEST_CROP) {
 
             profileDrawerItem.withIcon(data.getData());
             headerResult.updateProfile(profileDrawerItem);
